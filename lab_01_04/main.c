@@ -15,8 +15,8 @@
     #define DPRINT(...)
 #endif
 
-#define LFLOAT_MANTISSA_LEN 60
 #define LFLOAT_MANTISSA_DIGITS 30
+#define LFLOAT_MANTISSA_LEN (2 * LFLOAT_MANTISSA_DIGITS)
 #define LFLOAT_EXP_MAX 99999
 #define LFLOAT_FORMAT "%c0.%sE%+d"
 
@@ -41,7 +41,7 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r);
 int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r);
 int cmp_lfloat(lfloat_t a, lfloat_t b);
 int equal_exp(lfloat_t *a, lfloat_t *b);
-int offset_lfoat_mantissa(lfloat_t *n, int pow);
+int offset_lfloat_mantissa(lfloat_t *n, int pow);
 void print_lfloat(lfloat_t x);
 
 
@@ -60,18 +60,25 @@ int main(void)
     if ((err = input_lfloat(buf, &y)) != OK)
         goto failure;
 
+    printf("X(");
     print_lfloat(x);
-    printf("\n");
+    printf(") ? \nY(");
     print_lfloat(y);
-    printf("\n");
+    printf(") = \n");
 
-    sum_lfloat(x, y, &z);
+    if ((err = sum_lfloat(x, y, &z)) != OK)
+        goto failure;
 
+    printf("SUM(");
     print_lfloat(z);
-    printf("\n");
+    printf(")\n");
 
-    //if ((err = div_lfloat(&x, &y, &z)) != OK)
-    //   goto failure;
+    if ((err = div_lfloat(x, y, &z)) != OK)
+       goto failure;
+
+    printf("DIV(");
+    print_lfloat(z);
+    printf(")\n");
 
     return 0;
     failure:
@@ -87,7 +94,7 @@ int input_int_lfloat(char *num, lfloat_t *n)
             return INVALID_INPUT;
     }
 
-    return init_lfloat(num, n);
+    return input_lfloat(num, n);
 }
 
 int input_lfloat(char *num, lfloat_t *n)
@@ -233,7 +240,7 @@ int sum_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     {
         cell = a.mantissa[i] + b.mantissa[i] + cell - 2 * '0';
         r->mantissa[i] = cell % 10 + '0';
-        DPRINT("SUM [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
+        //DPRINT("SUM [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
         if (i <= LFLOAT_MANTISSA_LEN - a.len && cell > 9)
             overdigit++;
         cell /= 10;
@@ -282,7 +289,7 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
         cell = a.mantissa[i] - b.mantissa[i] + cell;
 
         r->mantissa[i] = (cell + 10) % 10 + '0';
-        DPRINT("SUB [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
+        //DPRINT("SUB [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
         if (i <= LFLOAT_MANTISSA_LEN - 1 - a.len && cell < 0)
             overdigit++;
         cell = cell < 0 ? -1 : 0;
@@ -299,9 +306,9 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     return OK;
 }
 
-int offset_lfoat_mantissa(lfloat_t *n, int offset)
+int offset_lfloat_mantissa(lfloat_t *n, int offset)
 {
-    int len = strlen(mantissa(n));
+    //int len = strlen(mantissa(n));
 
     // TODO: Exponent overflow checking
     // if (offset + n->exp > LFLOAT_EXP_MAX || offset + n->exp < -LFLOAT_EXP_MAX)
@@ -309,32 +316,40 @@ int offset_lfoat_mantissa(lfloat_t *n, int offset)
     // plus <-
     // minus ->
 
-    if (offset < 0)
+    if (offset > 0)
     {
-        offset *= -1;
-        DPRINT("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
+        n->len += offset;
+        #ifdef DEBUG
+            DPRINT("PLUS(%d): ", offset); print_lfloat(*n); printf("\n");
+        #endif
         for (int8_t i = 0; i < LFLOAT_MANTISSA_LEN; i++)
         {
-            if (offset <= i && i <= LFLOAT_MANTISSA_LEN - len + 2)
-                n->mantissa[i - offset] =
-                n->mantissa[i];
-
-            n->mantissa[i] = '0';
-        }
-        n->len += offset;
-    }
-    else if (offset > 0)
-    {
-        offset *= -1;
-        DPRINT("PLUS(%d): ", offset); print_lfloat(*n); printf("\n");
-        for (int8_t i = LFLOAT_MANTISSA_LEN - 1; i >= 0; i--)
-        {
-            if (LFLOAT_MANTISSA_LEN <= i + offset)
-                n->mantissa[i] = n->mantissa[i + offset - LFLOAT_MANTISSA_LEN];
+            if (offset <= i)
+            {
+                n->mantissa[i - offset] = n->mantissa[i];
+                n->mantissa[i] = '0';
+            }
             else
                 n->mantissa[i] = '0';
         }
-        n->len -= offset;
+    }
+    else if (offset < 0)
+    {
+        offset *= -1;
+        n->len += offset;
+        #ifdef DEBUG
+            DPRINT("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
+        #endif
+        /*for (int8_t i = 0; i < LFLOAT_MANTISSA_LEN; i++)
+        {
+            if (offset <= i && i <= LFLOAT_MANTISSA_LEN - len + 2)
+            {
+                n->mantissa[i - offset] = n->mantissa[i];
+                n->mantissa[i] = '0';
+            }
+            else
+                n->mantissa[i] = '0';
+        }*/
     }
 
     return OK;
@@ -361,19 +376,25 @@ int equal_exp(lfloat_t *a, lfloat_t *b)
 
     if (a->exp >= b->exp)
     {
-        b->len += a->exp - b->exp;
+        if ((err = offset_lfloat_mantissa(b, b->exp - a->exp)) != OK)
+            return err;
+
         b->exp = a->exp;
 
-        if ((err = offset_lfoat_mantissa(a, a->len - b->len)) != OK)
-            return err;
+        if (a->len >= b->len)
+        {
+            if ((err = offset_lfloat_mantissa(b, a->len - b->len)) != OK)
+                return err;
+        }
+        else
+        {
+            if ((err = offset_lfloat_mantissa(a, b->len - a->len)) != OK)
+                return err;
+        }
     }
-    else if (a->exp < b->exp)
+    else
     {
-        a->len += b->exp - a->exp;
-        a->exp = b->exp;
-
-        if ((err = offset_lfoat_mantissa(b, b->len - a->len)) != OK)
-            return err;
+        return equal_exp(b, a);
     }
 
     return err;
