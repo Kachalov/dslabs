@@ -204,11 +204,9 @@ int sum_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 {
     if (a.sign != b.sign)
     {
-        printf("call sub\n");
         b.sign = 1 - b.sign;
         return sub_lfloat(a, b, r);
     }
-    printf("call sum\n");
 
     int err = OK;
     int cell = 0;
@@ -223,7 +221,7 @@ int sum_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
         cell = a.mantissa[i] + b.mantissa[i] + cell - 2 * '0';
         r->mantissa[i] = cell % 10 + '0';
         DPRINT("SUM [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
-        if (i <= LFLOAT_MANTISSA_LEN - 1 - a.len && cell > 9)
+        if (i <= LFLOAT_MANTISSA_LEN - a.len && cell > 9)
             overdigit++;
         cell /= 10;
     }
@@ -266,11 +264,6 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     if ((err = equal_exp(&a, &b)) != OK)
         return err;
 
-    print_lfloat(a);
-    printf("\n");
-    print_lfloat(b);
-    printf("\n");
-
     for (int i = LFLOAT_MANTISSA_LEN - 1; i > 0; i--)
     {
         cell = a.mantissa[i] - b.mantissa[i] + cell;
@@ -279,7 +272,7 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
         DPRINT("SUB [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a.len - i, cell);
         if (i <= LFLOAT_MANTISSA_LEN - 1 - a.len && cell < 0)
             overdigit++;
-        cell /= 10;
+        cell = cell < 0 ? -1 : 0;
     }
     r->len = a.len - overdigit;
     r->exp = a.exp - overdigit;
