@@ -23,6 +23,7 @@
 #define OK 0
 #define INVALID_INPUT 1
 #define LFLOAT_OVERFLOW 2
+#define ZERO_DIVISION 3
 
 typedef struct 
 {
@@ -185,11 +186,14 @@ int input_lfloat(char *num, lfloat_t *n)
         DPRINT("\n");
     }
 
-    if (length == 0)
-        n->len = 1;
-
     n->exp += power;
     n->len = length;
+
+    if (length == 0)
+    {
+        n->len = 1;
+        n->exp = 1;
+    }
 
     DPRINT("Length: %d\n", length);
     for (int8_t i = LFLOAT_MANTISSA_LEN - 1; i >= 0; i--)
@@ -303,7 +307,42 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 
 int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 {
-    return OK;
+    int err = OK;
+    int sign = ((1 - 2 * a.sign) * (1 - 2 * b.sign) + 1) / 2;
+    int exp = a.exp - b.exp;
+    lfloat_t tmp;
+
+    init_lfloat(&tmp);
+    init_lfloat(r);
+
+    if (b.len < 2 && mantissa(&b)[0] == '0')
+    {
+        r->exp = 0;
+        r->len = 1;
+        r->sign = b.sign;
+        return ZERO_DIVISION;
+    }
+
+    *r = a;
+    r->exp = a.exp - b.exp;
+    r->sign = 0; r->sign++;
+    b.exp = r->exp;
+    b.sign = 0; b.sign++;
+
+    while (cmp_lfloat(*r, b) >= 0)
+    {
+        printf("%d ", cmp_lfloat(*r, b));
+        sub_lfloat(*r, b, &tmp);
+        if (tmp.sign != 1)
+            r->exp++;
+        printf("%d ", cmp_lfloat(*r, b));
+        print_lfloat(*r); printf("\n");
+    }
+
+    r->exp = exp;
+    r->sign = sign;
+
+    return err;
 }
 
 int offset_lfloat_mantissa(lfloat_t *n, int offset)
@@ -358,7 +397,7 @@ int offset_lfloat_mantissa(lfloat_t *n, int offset)
 int cmp_lfloat(lfloat_t a, lfloat_t b)
 {
     if (a.sign != b.sign)
-        return a.sign > b.sign;
+        return a.sign - b.sign;
 
     if (a.exp != b.exp)
         return (2*a.sign - 1) * (a.exp - b.exp);
