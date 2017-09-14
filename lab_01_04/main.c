@@ -147,7 +147,9 @@ int input_lfloat(char *num, lfloat_t *n)
                 if (count_digits) {
                     power += 2 * int_part - 1;
                 }
-                n->mantissa[length++] = *it;
+
+                if (*it != '0' || length != 0)
+                    n->mantissa[length++] = *it;
                 cond = true;
             }
         }
@@ -159,10 +161,10 @@ int input_lfloat(char *num, lfloat_t *n)
     }
 
     if (length == 0)
-        return INVALID_INPUT;
+        n->len = 1;
 
     n->exp += power;
-    n->len = length - (length > 1);
+    n->len = length;
 
     DPRINT("Length: %d\n", length);
     for (int8_t i = LFLOAT_MANTISSA_LEN - 1; i >= 0; i--)
@@ -211,8 +213,11 @@ int sum_lfloat(lfloat_t *a, lfloat_t *b, lfloat_t *r)
     }
 
     int err = OK;
+    int cell = 0;
+    char overdigit = 0;
+    init_lfloat(r);
 
-    if (a->exp > b->exp)
+    if (a->exp >= b->exp)
     {
         b->len += a->exp - b->exp;
         b->exp = a->exp;
@@ -229,11 +234,27 @@ int sum_lfloat(lfloat_t *a, lfloat_t *b, lfloat_t *r)
             return err;
     }
 
-
     printf("A: ");
     print_lfloat(*a);
     printf("\nB: ");
     print_lfloat(*b);
+    printf("\n");
+
+    for (int i = LFLOAT_MANTISSA_LEN - 1; i > 0; i--)
+    {
+        cell = a->mantissa[i] + b->mantissa[i] + cell - 2 * '0';
+        r->mantissa[i] = cell % 10 + '0';
+        DPRINT("SUM [%i] if=%d cell=%d\n", i, LFLOAT_MANTISSA_LEN - 1 - a->len - i, cell);
+        if (i <= LFLOAT_MANTISSA_LEN - 1 - a->len && cell > 9)
+            overdigit++;
+        cell /= 10;
+    }
+    r->len = a->len + overdigit;
+    r->exp = a->exp + overdigit;
+    r->sign = a->sign;
+
+    printf("RESULT: ");
+    print_lfloat(*r);
     printf("\n");
 
     return err;
@@ -256,13 +277,13 @@ int offset_lfoat_mantissa(lfloat_t *n, int offset)
 
     // if (offset + n->exp > LFLOAT_EXP_MAX || offset + n->exp < -LFLOAT_EXP_MAX)
     //     return LFLOAT_OVERFLOW;
-    // plus ->
-    // minus <-
+    // plus <-
+    // minus ->
 
     if (offset < 0)
     {
         offset *= -1;
-        printf("PLUS(%d): ", offset); print_lfloat(*n); printf("\n");
+        printf("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
         for (int8_t i = 0; i < LFLOAT_MANTISSA_LEN; i++)
         {
             if (offset <= i && i <= LFLOAT_MANTISSA_LEN - len + 2)
@@ -276,7 +297,7 @@ int offset_lfoat_mantissa(lfloat_t *n, int offset)
     else if (offset > 0)
     {
         offset *= -1;
-        printf("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
+        printf("PLUS(%d): ", offset); print_lfloat(*n); printf("\n");
         for (int8_t i = LFLOAT_MANTISSA_LEN - 1; i >= 0; i--)
         {
             if (LFLOAT_MANTISSA_LEN <= i + offset)
