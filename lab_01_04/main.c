@@ -34,6 +34,7 @@ typedef struct
 
 char *mantissa(lfloat_t *n);
 int input_lfloat(char *num, lfloat_t *n);
+int input_int_lfloat(char *num, lfloat_t *n);
 void init_lfloat(lfloat_t *n);
 int sum_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r);
 int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r);
@@ -51,6 +52,7 @@ int main(void)
     char buf[80];
 
     fgets(buf, 80, stdin);
+    // if ((err = input_int_lfloat(buf, &x)) != OK)
     if ((err = input_lfloat(buf, &x)) != OK)
         goto failure;
 
@@ -75,6 +77,17 @@ int main(void)
     failure:
     fprintf(stderr, "Err code: %d\n", err);
     return 1;
+}
+
+int input_int_lfloat(char *num, lfloat_t *n)
+{
+    for (char *it = num; *it != '\n' && *it != '\r' && *it != '\0'; it++)
+    {
+        if (*it == '.' || *it == 'e' || *it == 'E')
+            return INVALID_INPUT;
+    }
+
+    return init_lfloat(num, n);
 }
 
 int input_lfloat(char *num, lfloat_t *n)
