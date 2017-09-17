@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -Wall -Werror -pedantic -std=c99
+CFLAGS := -Wall -Werror -pedantic -std=c99 -DFULLMAN
 FILES := main.c
 DEST := main.exe
 

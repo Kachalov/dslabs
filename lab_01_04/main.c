@@ -15,7 +15,8 @@
     #define DPRINT(...)
 #endif
 
-#define LFLOAT_MANTISSA_DIGITS 30
+// TODO: Change to 30
+#define LFLOAT_MANTISSA_DIGITS 5
 #define LFLOAT_MANTISSA_LEN (2 * LFLOAT_MANTISSA_DIGITS)
 #define LFLOAT_EXP_MAX 99999
 #define LFLOAT_FORMAT "%c0.%sE%+d"
@@ -28,7 +29,7 @@
 typedef struct 
 {
     int32_t exp;
-    int32_t sign:1;
+    uint8_t sign:1;
     int32_t len:31;
     char mantissa[LFLOAT_MANTISSA_LEN + 1];
 } lfloat_t;
@@ -211,8 +212,7 @@ void init_lfloat(lfloat_t *n)
 {
     n->exp = 0;
     n->len = 0;
-    n->sign = 0;
-    n->sign++;
+    n->sign = 1;
 
     for (uint8_t i = 0; i < LFLOAT_MANTISSA_LEN; i++)
         n->mantissa[i] = '0';
@@ -273,10 +273,12 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     int err = OK;
     int cell = 0;
     char overdigit = 0;
+    int sign = cmp_lfloat(a, b);
     lfloat_t tmp;
     init_lfloat(r);
 
-    if (cmp_lfloat(a, b) > 0)
+        printf("SIGN: %d\n", sign);
+    if (sign < 0)
     {
         tmp = a;
         a = b;
@@ -288,7 +290,9 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     if ((err = equal_exp(&a, &b)) != OK)
         return err;
 
-    for (int i = LFLOAT_MANTISSA_LEN - 1; i > 0; i--)
+    print_lfloat(a); printf(" - "); print_lfloat(b); printf(" = ");
+
+    for (int i = LFLOAT_MANTISSA_LEN - 1; i > LFLOAT_MANTISSA_LEN - 1 - a.len; i--)
     {
         cell = a.mantissa[i] - b.mantissa[i] + cell;
 
@@ -300,7 +304,9 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     }
     r->len = a.len - overdigit;
     r->exp = a.exp - overdigit;
-    r->sign = a.sign;
+    r->sign = sign > 0 ? 1 : (sign == 0 ? a.sign : 0);
+
+    print_lfloat(*r); printf("\n=======\n");
 
     return err;
 }
@@ -310,10 +316,14 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     int err = OK;
     int sign = ((1 - 2 * a.sign) * (1 - 2 * b.sign) + 1) / 2;
     int exp = a.exp - b.exp;
-    lfloat_t tmp;
+    lfloat_t tmp, one, zero;
 
     init_lfloat(&tmp);
+    init_lfloat(&one);
+    init_lfloat(&zero);
     init_lfloat(r);
+
+    one.mantissa[LFLOAT_MANTISSA_LEN - 1] = '1';
 
     if (b.len < 2 && mantissa(&b)[0] == '0')
     {
@@ -325,18 +335,31 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 
     *r = a;
     r->exp = a.exp - b.exp;
-    r->sign = 0; r->sign++;
+    one.exp = r->exp - 1;
+    r->sign = 1;
     b.exp = r->exp;
-    b.sign = 0; b.sign++;
+    b.sign = 1;
 
-    while (cmp_lfloat(*r, b) >= 0)
+    int i = 0;
+    print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
+    while (1)
     {
-        printf("%d ", cmp_lfloat(*r, b));
-        sub_lfloat(*r, b, &tmp);
-        if (tmp.sign != 1)
-            r->exp++;
-        printf("%d ", cmp_lfloat(*r, b));
-        print_lfloat(*r); printf("\n");
+        i++;
+        if ((err = sub_lfloat(a, b, &tmp)) != OK)
+            return err;
+
+        if (cmp_lfloat(tmp, zero) == 0 || tmp.len > LFLOAT_MANTISSA_LEN)
+            break;
+
+        if (tmp.sign == 0)
+        {
+            b.exp--;
+            one.exp--;
+            continue;
+        }
+        a = tmp;
+        sum_lfloat(*r, one, r);
+        printf("sum: "); print_lfloat(*r); printf("\n");
     }
 
     r->exp = exp;
@@ -399,12 +422,18 @@ int cmp_lfloat(lfloat_t a, lfloat_t b)
     if (a.sign != b.sign)
         return a.sign - b.sign;
 
-    if (a.exp != b.exp)
-        return (2*a.sign - 1) * (a.exp - b.exp);
+    equal_exp(&a, &b);
+    char *ma = mantissa(&a);
+    char *mb = mantissa(&b);
 
-    for (int i = LFLOAT_MANTISSA_LEN - 1 - a.len; i < LFLOAT_MANTISSA_LEN; i++)
-        if (a.mantissa[i] != b.mantissa[i])
-            return (2*a.sign - 1) * (a.mantissa[i] - b.mantissa[i]);
+    print_lfloat(a); printf(" ?= "); print_lfloat(b); printf("\n");
+
+    if (a.exp != b.exp)
+        return (2 * a.sign - 1) * (a.exp - b.exp);
+
+    for (int i = 0; i < strlen(ma); i++)
+        if (ma[i] != mb[i])
+            return (2 * a.sign - 1) * (ma[i] - mb[i]);
 
     return 0;
 }
@@ -441,5 +470,14 @@ int equal_exp(lfloat_t *a, lfloat_t *b)
 
 void print_lfloat(lfloat_t x)
 {
-    printf(LFLOAT_FORMAT, x.sign ? '+' : '-', mantissa(&x), (int) x.exp);
+    #ifndef FULLMAN
+        printf(LFLOAT_FORMAT, x.sign ? '+' : '-', mantissa(&x), (int) x.exp);
+    #else
+        char tmp[LFLOAT_MANTISSA_LEN + 1];
+        strcpy(tmp, x.mantissa);
+        tmp[LFLOAT_MANTISSA_LEN - x.len] = '\0';
+        printf("%c0.\x1b[31m%s\x1b[0m%sE%+d", x.sign ? '+' : '-',
+               tmp,
+               mantissa(&x), (int) x.exp);
+    #endif
 }
