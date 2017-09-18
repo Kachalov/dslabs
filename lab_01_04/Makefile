@@ -1,5 +1,7 @@
 CC := gcc
-CFLAGS := -Wall -Werror -pedantic -std=c99 -DFULLMAN
+# -DFULLMAN - for printing invisible part of mantissa
+# mode=debug - for debug
+CFLAGS := -Wall -Werror -pedantic -std=c99
 FILES := main.c
 DEST := main.exe
 

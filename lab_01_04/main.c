@@ -45,6 +45,7 @@ int cmp_lfloat(lfloat_t a, lfloat_t b);
 int equal_exp(lfloat_t *a, lfloat_t *b);
 int offset_lfloat_mantissa(lfloat_t *n, int pow);
 void print_lfloat(lfloat_t x);
+void normalize_lfloat(lfloat_t *x);
 
 
 int main(void)
@@ -341,6 +342,7 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     r->sign = 1;
     one.exp = -1;
     b.exp = a.exp;
+    a.sign = 1;
     b.sign = 1;
 
     //print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
@@ -369,6 +371,7 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 
     r->exp = exp + 1;
     r->sign = sign;
+    normalize_lfloat(r);
 
     return err;
 }
@@ -491,4 +494,20 @@ void print_lfloat(lfloat_t x)
                tmp,
                mantissa(&x), (int) x.exp);
     #endif
+}
+
+void normalize_lfloat(lfloat_t *x)
+{
+    char *m = mantissa(x);
+
+    if (x->len < 2)
+        return;
+
+    while (*m == '0' && *m != '\0')
+    {
+        x->len--;
+        x->exp--;
+        *m = '0';
+        m++;
+    }
 }
