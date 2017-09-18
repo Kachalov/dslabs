@@ -104,6 +104,9 @@ int input_lfloat(char *num, lfloat_t *n)
     uint8_t length = 0;
     char *it = num;
 
+    if (strlen(num) < 2)
+        return  INVALID_INPUT;
+
     init_lfloat(n);
 
     if (*it == '-' || *it == '+')
