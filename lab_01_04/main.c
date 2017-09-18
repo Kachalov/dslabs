@@ -46,6 +46,7 @@ int equal_exp(lfloat_t *a, lfloat_t *b);
 int offset_lfloat_mantissa(lfloat_t *n, int pow);
 void print_lfloat(lfloat_t x);
 void normalize_lfloat(lfloat_t *x);
+int check_lfloat(lfloat_t x);
 
 
 int main(void)
@@ -55,6 +56,7 @@ int main(void)
     char buf[80];
 
     fgets(buf, 80, stdin);
+    // TODO: integer
     // if ((err = input_int_lfloat(buf, &x)) != OK)
     if ((err = input_lfloat(buf, &x)) != OK)
         goto failure;
@@ -63,25 +65,19 @@ int main(void)
     if ((err = input_lfloat(buf, &y)) != OK)
         goto failure;
 
-    printf("X(");
     print_lfloat(x);
-    printf(") ? \nY(");
+    printf("\n/\n");
     print_lfloat(y);
-    printf(") = \n");
-
-    if ((err = sum_lfloat(x, y, &z)) != OK)
-        goto failure;
-
-    //printf("SUM(");
-    //print_lfloat(z);
-    //printf(")\n");
+    printf("\n=\n");
 
     if ((err = div_lfloat(x, y, &z)) != OK)
        goto failure;
 
-    printf("DIV(");
+    if ((err = check_lfloat(z)) != OK)
+        goto failure;
+
     print_lfloat(z);
-    printf(")\n");
+    printf("\n");
 
     return 0;
     failure:
@@ -278,7 +274,6 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     lfloat_t tmp;
     init_lfloat(r);
 
-    //printf("SIGN: %d\n", sign);
     if (sign < 0)
     {
         tmp = a;
@@ -291,7 +286,9 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     if ((err = equal_exp(&a, &b)) != OK)
         return err;
 
-    print_lfloat(a); printf(" - "); print_lfloat(b); printf(" = ");
+    #ifdef DEBUG
+        print_lfloat(a); printf(" - "); print_lfloat(b); printf(" = ");
+    #endif
 
     for (int i = LFLOAT_MANTISSA_LEN - 1; i > LFLOAT_MANTISSA_LEN - 1 - a.len; i--)
     {
@@ -306,8 +303,6 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     r->len = a.len - overdigit;
     r->exp = a.exp - overdigit;
     r->sign = sign > 0 ? 1 : (sign == 0 ? a.sign : 0);
-
-    print_lfloat(*r); printf("\n=======\n");
 
     return err;
 }
@@ -335,8 +330,6 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
         return ZERO_DIVISION;
     }
 
-    //*r = a;
-    //r->exp = a.exp - b.exp;
     r->exp = 0;
     r->len = 1;
     r->sign = 1;
@@ -345,7 +338,6 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     a.sign = 1;
     b.sign = 1;
 
-    //print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
     while (i > 0)
     {
         if ((err = sub_lfloat(a, b, &tmp)) != OK)
@@ -356,14 +348,15 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
             b.exp--;
             one.exp--;
             i--;
-            //continue;
         }
         else
         {
             a = tmp;
             sum_lfloat(*r, one, r);
         }
-        printf("sum: "); print_lfloat(*r); printf("\n");
+        #ifdef DEBUG
+                printf("sum: "); print_lfloat(*r); printf("\n");
+        #endif
 
         if (cmp_lfloat(tmp, zero) == 0 || tmp.len > LFLOAT_MANTISSA_LEN)
             break;
@@ -378,11 +371,6 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
 
 int offset_lfloat_mantissa(lfloat_t *n, int offset)
 {
-    //int len = strlen(mantissa(n));
-
-    // TODO: Exponent overflow checking
-    // if (offset + n->exp > LFLOAT_EXP_MAX || offset + n->exp < -LFLOAT_EXP_MAX)
-    //     return LFLOAT_OVERFLOW;
     // plus <-
     // minus ->
 
@@ -416,16 +404,6 @@ int offset_lfloat_mantissa(lfloat_t *n, int offset)
         #ifdef DEBUG
             DPRINT("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
         #endif
-        /*for (int8_t i = 0; i < LFLOAT_MANTISSA_LEN; i++)
-        {
-            if (offset <= i && i <= LFLOAT_MANTISSA_LEN - len + 2)
-            {
-                n->mantissa[i - offset] = n->mantissa[i];
-                n->mantissa[i] = '0';
-            }
-            else
-                n->mantissa[i] = '0';
-        }*/
     }
 
     return OK;
@@ -440,10 +418,9 @@ int cmp_lfloat(lfloat_t a, lfloat_t b)
     char *ma = mantissa(&a);
     char *mb = mantissa(&b);
 
-    print_lfloat(a); printf(" ?= "); print_lfloat(b); printf("\n");
-
-    //if (a.exp != b.exp)
-    //    return (2 * a.sign - 1) * (a.exp - b.exp);
+    #ifdef DEBUG
+        print_lfloat(a); printf(" ?= "); print_lfloat(b); printf("\n");
+    #endif
 
     for (int i = 0; i < strlen(ma); i++)
         if (ma[i] != mb[i])
@@ -503,6 +480,8 @@ void normalize_lfloat(lfloat_t *x)
     if (x->len < 2)
         return;
 
+    // TODO: rounding mantissa
+
     while (*m == '0' && *m != '\0')
     {
         x->len--;
@@ -510,4 +489,15 @@ void normalize_lfloat(lfloat_t *x)
         *m = '0';
         m++;
     }
+}
+
+int check_lfloat(lfloat_t x)
+{
+    if (x.exp > LFLOAT_EXP_MAX || x.exp < -LFLOAT_EXP_MAX)
+        return INVALID_INPUT;
+
+    if (x.len > LFLOAT_MANTISSA_DIGITS)
+        return INVALID_INPUT;
+
+    return OK;
 }
