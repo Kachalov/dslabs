@@ -4,6 +4,7 @@ CC := gcc
 CFLAGS := -Wall -Werror -pedantic -std=c99
 FILES := main.c
 DEST := main.exe
+DEST_SO := main.so
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage
@@ -14,8 +15,11 @@ ifeq ($(mode), release)
 endif
 
 
-run:
+main.exe:
 	$(CC) $(CFLAGS) -o $(DEST) $(FILES)
+
+main.so:
+	$(CC) -shared -fpic $(CFLAGS) -o $(DEST_SO) $(FILES)
 
 clean:
 	rm -f *.exe *.gcda *.gcno

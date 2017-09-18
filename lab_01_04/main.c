@@ -46,6 +46,7 @@ int offset_lfloat_mantissa(lfloat_t *n, int pow);
 void print_lfloat(lfloat_t x);
 void normalize_lfloat(lfloat_t *x);
 int check_lfloat(lfloat_t x);
+int mantissa_len(void);
 
 
 int main(void)
@@ -80,6 +81,11 @@ int main(void)
     failure:
     fprintf(stderr, "Err code: %d\n", err);
     return 1;
+}
+
+int mantissa_len(void)
+{
+    return LFLOAT_MANTISSA_LEN;
 }
 
 int input_int_lfloat(char *num, lfloat_t *n)
