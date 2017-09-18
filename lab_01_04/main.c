@@ -103,6 +103,7 @@ int input_lfloat(char *num, lfloat_t *n)
     int32_t exp = 0;
     uint8_t length = 0;
     char *it = num;
+    int sym = 0;
 
     if (strlen(num) < 2)
         return  INVALID_INPUT;
@@ -121,7 +122,7 @@ int input_lfloat(char *num, lfloat_t *n)
         if (*it == '+' || *it == '-')
             return INVALID_INPUT;
 
-        if (length > LFLOAT_MANTISSA_DIGITS)
+        if (sym > LFLOAT_MANTISSA_DIGITS)
             return INVALID_INPUT;
 
         DPRINT("[%d][%c](%2X) ", length, *it, *it);
@@ -152,6 +153,8 @@ int input_lfloat(char *num, lfloat_t *n)
 
         if (('0' <= *it && *it <= '9') || *it == '.')
         {
+            sym++;
+
             if (int_part && !count_digits && *it != '0')
             {
                 count_digits = true;
@@ -522,10 +525,10 @@ void normalize_lfloat(lfloat_t *x)
 int check_lfloat(lfloat_t x)
 {
     if (x.exp > LFLOAT_EXP_MAX || x.exp < -LFLOAT_EXP_MAX)
-        return INVALID_INPUT;
+        return LFLOAT_OVERFLOW;
 
     if (x.len > LFLOAT_MANTISSA_DIGITS)
-        return INVALID_INPUT;
+        return LFLOAT_OVERFLOW;
 
     return OK;
 }
