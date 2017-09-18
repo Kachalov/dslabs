@@ -10,13 +10,12 @@
 #include <string.h>
 
 #ifdef DEBUG
-    #define DPRINT(...) {fprintf(stderr, __VA_ARGS__);}
+    #define DPRINT(...) {fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");}
 #else
     #define DPRINT(...)
 #endif
 
-// TODO: Change to 30
-#define LFLOAT_MANTISSA_DIGITS 5
+#define LFLOAT_MANTISSA_DIGITS 30
 #define LFLOAT_MANTISSA_LEN (2 * LFLOAT_MANTISSA_DIGITS)
 #define LFLOAT_EXP_MAX 99999
 #define LFLOAT_FORMAT "%c0.%sE%+d"
@@ -56,9 +55,8 @@ int main(void)
     char buf[80];
 
     fgets(buf, 80, stdin);
-    // TODO: integer
-    // if ((err = input_int_lfloat(buf, &x)) != OK)
-    if ((err = input_lfloat(buf, &x)) != OK)
+    if ((err = input_int_lfloat(buf, &x)) != OK)
+    //if ((err = input_lfloat(buf, &x)) != OK)
         goto failure;
 
     fgets(buf, 80, stdin);
@@ -476,11 +474,15 @@ void print_lfloat(lfloat_t x)
 void normalize_lfloat(lfloat_t *x)
 {
     char *m = mantissa(x);
+    lfloat_t one;
+    int length = 0;
+
+    init_lfloat(&one);
+    one.mantissa[LFLOAT_MANTISSA_LEN - 1] = '1';
+    one.len = 1;
 
     if (x->len < 2)
         return;
-
-    // TODO: rounding mantissa
 
     while (*m == '0' && *m != '\0')
     {
@@ -488,6 +490,29 @@ void normalize_lfloat(lfloat_t *x)
         x->exp--;
         *m = '0';
         m++;
+    }
+
+    m = mantissa(x);
+
+    if (x->len > LFLOAT_MANTISSA_DIGITS)
+    {
+        if (*(m + LFLOAT_MANTISSA_DIGITS) >= '5')
+        {
+            one.exp = x->exp + LFLOAT_MANTISSA_DIGITS - x->len;
+            sum_lfloat(*x, one, x);
+        }
+
+        m = mantissa(x);
+
+        length = LFLOAT_MANTISSA_DIGITS + LFLOAT_MANTISSA_LEN - x->len;
+        for (int8_t i = LFLOAT_MANTISSA_LEN - 1; i >= 0; i--)
+        {
+            if (LFLOAT_MANTISSA_LEN <= i + length)
+                x->mantissa[i] = x->mantissa[i + length - LFLOAT_MANTISSA_LEN];
+            else
+                x->mantissa[i] = '0';
+        }
+        x->len = LFLOAT_MANTISSA_DIGITS;
     }
 }
 
