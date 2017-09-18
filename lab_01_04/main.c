@@ -63,17 +63,16 @@ int main(void)
     if ((err = input_lfloat(buf, &y)) != OK)
         goto failure;
 
-    print_lfloat(x);
-    printf("\n/\n");
-    print_lfloat(y);
-    printf("\n=\n");
-
     if ((err = div_lfloat(x, y, &z)) != OK)
        goto failure;
 
     if ((err = check_lfloat(z)) != OK)
         goto failure;
 
+    //print_lfloat(x);
+    //printf("\n/\n");
+    //print_lfloat(y);
+    //printf("\n=\n");
     print_lfloat(z);
     printf("\n");
 
