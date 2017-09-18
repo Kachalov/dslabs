@@ -71,9 +71,9 @@ int main(void)
     if ((err = sum_lfloat(x, y, &z)) != OK)
         goto failure;
 
-    printf("SUM(");
-    print_lfloat(z);
-    printf(")\n");
+    //printf("SUM(");
+    //print_lfloat(z);
+    //printf(")\n");
 
     if ((err = div_lfloat(x, y, &z)) != OK)
        goto failure;
@@ -123,7 +123,7 @@ int input_lfloat(char *num, lfloat_t *n)
         if (*it == '+' || *it == '-')
             return INVALID_INPUT;
 
-        if (length >= LFLOAT_MANTISSA_DIGITS)
+        if (length > LFLOAT_MANTISSA_DIGITS)
             return INVALID_INPUT;
 
         DPRINT("[%d][%c](%2X) ", length, *it, *it);
@@ -277,7 +277,7 @@ int sub_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     lfloat_t tmp;
     init_lfloat(r);
 
-        printf("SIGN: %d\n", sign);
+    //printf("SIGN: %d\n", sign);
     if (sign < 0)
     {
         tmp = a;
@@ -316,6 +316,7 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     int err = OK;
     int sign = ((1 - 2 * a.sign) * (1 - 2 * b.sign) + 1) / 2;
     int exp = a.exp - b.exp;
+    int i = LFLOAT_MANTISSA_LEN;
     lfloat_t tmp, one, zero;
 
     init_lfloat(&tmp);
@@ -333,33 +334,40 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
         return ZERO_DIVISION;
     }
 
-    *r = a;
-    r->exp = a.exp - b.exp;
-    one.exp = r->exp - 1;
+    //*r = a;
+    //r->exp = a.exp - b.exp;
+    r->exp = 0;
+    r->len = 1;
     r->sign = 1;
-    b.exp = r->exp;
+    one.exp = -1;
+    b.exp = a.exp;
     b.sign = 1;
 
-    int i = 0;
-    print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
-    while (1)
+    if (cmp_lfloat(a, b) < 0)
+        exp++;
+
+    //print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
+    while (i > 0)
     {
-        i++;
         if ((err = sub_lfloat(a, b, &tmp)) != OK)
             return err;
-
-        if (cmp_lfloat(tmp, zero) == 0 || tmp.len > LFLOAT_MANTISSA_LEN)
-            break;
 
         if (tmp.sign == 0)
         {
             b.exp--;
             one.exp--;
-            continue;
+            i--;
+            //continue;
         }
-        a = tmp;
-        sum_lfloat(*r, one, r);
+        else
+        {
+            a = tmp;
+            sum_lfloat(*r, one, r);
+        }
         printf("sum: "); print_lfloat(*r); printf("\n");
+
+        if (cmp_lfloat(tmp, zero) == 0 || tmp.len > LFLOAT_MANTISSA_LEN)
+            break;
     }
 
     r->exp = exp;
@@ -380,7 +388,10 @@ int offset_lfloat_mantissa(lfloat_t *n, int offset)
 
     if (offset > 0)
     {
-        n->len += offset;
+        if (n->len + offset > LFLOAT_MANTISSA_LEN)
+            n->len = LFLOAT_MANTISSA_LEN;
+        else
+            n->len += offset;
         #ifdef DEBUG
             DPRINT("PLUS(%d): ", offset); print_lfloat(*n); printf("\n");
         #endif
@@ -398,7 +409,10 @@ int offset_lfloat_mantissa(lfloat_t *n, int offset)
     else if (offset < 0)
     {
         offset *= -1;
-        n->len += offset;
+        if (n->len + offset > LFLOAT_MANTISSA_LEN)
+            n->len = LFLOAT_MANTISSA_LEN;
+        else
+            n->len += offset;
         #ifdef DEBUG
             DPRINT("MINUS(%d): ", offset); print_lfloat(*n); printf("\n");
         #endif
@@ -428,8 +442,8 @@ int cmp_lfloat(lfloat_t a, lfloat_t b)
 
     print_lfloat(a); printf(" ?= "); print_lfloat(b); printf("\n");
 
-    if (a.exp != b.exp)
-        return (2 * a.sign - 1) * (a.exp - b.exp);
+    //if (a.exp != b.exp)
+    //    return (2 * a.sign - 1) * (a.exp - b.exp);
 
     for (int i = 0; i < strlen(ma); i++)
         if (ma[i] != mb[i])
