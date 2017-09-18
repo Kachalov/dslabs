@@ -343,9 +343,6 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
     b.exp = a.exp;
     b.sign = 1;
 
-    if (cmp_lfloat(a, b) < 0)
-        exp++;
-
     //print_lfloat(a); printf(" : "); print_lfloat(b); printf("\n");
     while (i > 0)
     {
@@ -370,7 +367,7 @@ int div_lfloat(lfloat_t a, lfloat_t b, lfloat_t *r)
             break;
     }
 
-    r->exp = exp;
+    r->exp = exp + 1;
     r->sign = sign;
 
     return err;
