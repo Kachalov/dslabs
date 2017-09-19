@@ -29,10 +29,9 @@ def main(stdscr):
 
 def main2(stdscr):
     stdscr.addstr(0, 0, ("{:^%ds}" % (curses.COLS - 1))
-                  .format(" Professional divider"), curses.A_BOLD)
+                  .format("Calculator"), curses.A_BOLD)
     stdscr.addstr(1, 0, "A: ", curses.A_BOLD)
-    #stdscr.addstr(int_f)
-    stdscr.addstr(float_f)
+    stdscr.addstr(int_f)
     stdscr.addstr(" / ")
     stdscr.addstr(2, 0, "B: ", curses.A_BOLD)
     stdscr.addstr(float_f)
