@@ -44,6 +44,7 @@ int cmp_lfloat(lfloat_t a, lfloat_t b);
 int equal_exp(lfloat_t *a, lfloat_t *b);
 int offset_lfloat_mantissa(lfloat_t *n, int pow);
 void print_lfloat(lfloat_t x);
+void format_lfloat(lfloat_t x, char *r);
 void normalize_lfloat(lfloat_t *x);
 int check_lfloat(lfloat_t x);
 int mantissa_len(void);
@@ -471,7 +472,9 @@ int equal_exp(lfloat_t *a, lfloat_t *b)
 void print_lfloat(lfloat_t x)
 {
     #ifndef FULLMAN
-        printf(LFLOAT_FORMAT, x.sign ? '+' : '-', mantissa(&x), (int) x.exp);
+        char tmp[80];
+        format_lfloat(x, tmp);
+        printf("%s", tmp);
     #else
         char tmp[LFLOAT_MANTISSA_LEN + 1];
         strcpy(tmp, x.mantissa);
@@ -480,6 +483,11 @@ void print_lfloat(lfloat_t x)
                tmp,
                mantissa(&x), (int) x.exp);
     #endif
+}
+
+void format_lfloat(lfloat_t x, char *r)
+{
+    sprintf(r, LFLOAT_FORMAT, x.sign ? '+' : '-', mantissa(&x), (int) x.exp);
 }
 
 void normalize_lfloat(lfloat_t *x)
