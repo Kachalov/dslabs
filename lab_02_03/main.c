@@ -24,6 +24,13 @@ int main(void)
     init_students_t(&ss);
     init_student_t(&student);
 
+    memcpy(student.data.name, "Ira\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" , 20);
+    student_add(&ss, student);
+    memcpy(student.data.name, "Viniamin\0\0\0\0\0\0\0\0\0\0\0\0", 20);
+    student_add(&ss, student);
+    memcpy(student.data.name, "Vasya\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 20);
+    student_add(&ss, student);
+
     err = save_students("test.stud", &ss);
 //    err = load_students("test.stud", &ss);
 //    printf("%d\n", (int) ss.n);

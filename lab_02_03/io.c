@@ -6,6 +6,9 @@
 
 #include "errors.h"
 
+#define TRY(f, ex, t, e, g) {if ((e = (f) != (ex) ? (t) : e) != OK) goto g;}
+#define EXCEPT(g) g:
+
 int save_students(char *fn, students_t *students)
 {
     int err = OK;
@@ -17,6 +20,9 @@ int save_students(char *fn, students_t *students)
         fd == NULL
         ? IOERR : err) != OK)
         goto fail;
+
+//    TRY(fd != NULL, 1, IOERR, err, fail);
+//    TRY(fwrite(&version, sizeof(version), 1, fd), 1, IOERR, err, fail);
 
     if ((err =
         fwrite(&version, sizeof(version), 1, fd) != 1
@@ -31,6 +37,7 @@ int save_students(char *fn, students_t *students)
             ? IOERR : err) != OK)
             goto fail;
 
+//    EXCEPT(fail);
     fail:
     if (fd != NULL)
     {

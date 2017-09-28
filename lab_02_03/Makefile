@@ -24,4 +24,4 @@ main.so:
 	$(CC) -shared -fpic $(CFLAGS) $^ -o $@
 
 clean:
-	rm -f *.exe *.gcda *.gcno
+	rm -f *.exe *.gcda *.gcno *.o
