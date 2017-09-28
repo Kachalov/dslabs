@@ -3,6 +3,11 @@
 #include "data.h"
 #include "errors.h"
 
+uint8_t inline students_ver(void)
+{
+    return STUDENTS_VER;
+}
+
 int init_data_t(data_t *d)
 {
     d->gender = MALE;
@@ -20,5 +25,15 @@ int init_student_t(student_t *s)
     init_data_t(&(s->data));
     s->housing = HOME;
 
+    return OK;
+}
+
+int student_add(students_t *students, student_t *student)
+{
+    return OK;
+}
+
+int student_del(students_t *students, student_t *student)
+{
     return OK;
 }

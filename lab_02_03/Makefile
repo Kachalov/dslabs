@@ -1,7 +1,7 @@
 CC := gcc
 # mode=debug - for debug
 CFLAGS := -Wall -Werror -pedantic -std=c11
-FILES := main.c data.c
+FILES := main.c data.c io.c
 DEST := main.exe
 DEST_SO := main.so
 
