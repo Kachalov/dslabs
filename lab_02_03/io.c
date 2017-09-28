@@ -9,6 +9,34 @@
 int save_students(char *fn, students_t *students)
 {
     int err = OK;
+    uint8_t version = STUDENTS_VER;
+
+    FILE *fd = fopen(fn, "wb");
+
+    if ((err =
+        fd == NULL
+        ? IOERR : err) != OK)
+        goto fail;
+
+    if ((err =
+        fwrite(&version, sizeof(version), 1, fd) != 1
+        ? IOERR : err) != OK)
+        goto fail;
+
+    for (students_item_t *si = students->b;
+         si != NULL;
+         si = si->n)
+        if ((err =
+            fwrite(&si->s, sizeof(si->s), 1, fd) != 1
+            ? IOERR : err) != OK)
+            goto fail;
+
+    fail:
+    if (fd != NULL)
+    {
+        fclose(fd);
+        fd = NULL;
+    }
 
     return err;
 }
@@ -19,14 +47,15 @@ int load_students(char *fn, students_t *students)
     uint8_t version = 0;
     student_t student;
 
-    FILE *fd = fopen(fn, "wb");
+    FILE *fd = fopen(fn, "rb");
+
     if ((err =
         fd == NULL
         ? IOERR : err) != OK)
         goto fail;
 
     if ((err =
-        fread(&version, sizeof(version), 1, fd) != sizeof(version)
+        fread(&version, sizeof(version), 1, fd) != 1
         ? IOERR : err) != OK)
         goto fail;
 
@@ -35,9 +64,11 @@ int load_students(char *fn, students_t *students)
         ? OLD_FORMAT : err) != OK)
         goto fail;
 
-    while (fread(&student, sizeof(student), 1, fd) == sizeof(student))
-        if ((err = student_add(students, &student)) != OK)
+    while (fread(&student, sizeof(student), 1, fd) == 1)
+    {
+        if ((err = student_add(students, student)) != OK)
             goto fail;
+    }
 
     fail:
     if (fd != NULL)

@@ -1,24 +1,27 @@
 CC := gcc
 # mode=debug - for debug
 CFLAGS := -Wall -Werror -pedantic -std=c11
-FILES := main.c data.c io.c
-DEST := main.exe
-DEST_SO := main.so
+OBJS := data.o io.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage
 endif
 
 ifeq ($(mode), release)
-	CFLAGS += -DNDEBUG -g0
+	CFLAGS += -DNDEBUG
 endif
 
+main.exe: $(OBJS) main.o
+	$(CC) $(CFLAGS) $^ -o $@
 
-main.exe:
-	$(CC) $(CFLAGS) -o $(DEST) $(FILES)
+test.exe: $(OBJS) test.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c *.h
+	$(CC) $(CFLAGS) -c $<
 
 main.so:
-	$(CC) -shared -fpic $(CFLAGS) -o $(DEST_SO) $(FILES)
+	$(CC) -shared -fpic $(CFLAGS) $^ -o $@
 
 clean:
 	rm -f *.exe *.gcda *.gcno

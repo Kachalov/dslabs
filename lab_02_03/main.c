@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "data.h"
 #include "io.h"
@@ -18,7 +19,14 @@ int main(void)
     printf("students_t: %lu\n", sizeof(students_t));
 
     students_t ss;
-    err = load_students("test.stud", &ss);
+    student_t student;
+
+    init_students_t(&ss);
+    init_student_t(&student);
+
+    err = save_students("test.stud", &ss);
+//    err = load_students("test.stud", &ss);
+//    printf("%d\n", (int) ss.n);
     printf("Err code: %d\n", err);
 
     return 0;

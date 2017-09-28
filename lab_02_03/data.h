@@ -42,16 +42,25 @@ typedef struct
     data_t data;
 } student_t;
 
-typedef struct _students_t
+typedef struct students_item_t
 {
     student_t s;
-    struct _students_t *n;
+    struct students_item_t *n;
+} students_item_t;
+
+typedef struct
+{
+    size_t n;
+    students_item_t *b;
+    students_item_t *e;
 } students_t;
 #pragma pack(pop)
 
 int init_data_t(data_t *data);
 int init_student_t(student_t *student);
-uint8_t inline students_ver(void);
+int init_students_t(students_t *students);
+int init_student_item_t(students_item_t *student);
+uint8_t students_ver(void);
 
-int student_add(students_t *students, student_t *student);
-int student_del(students_t *students, student_t *student);
+int student_add(students_t *students, student_t student);
+int student_del(students_t *students, student_t student);
