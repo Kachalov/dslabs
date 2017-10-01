@@ -12,7 +12,7 @@
 int save_students(char *fn, students_t *students)
 {
     int err = OK;
-    uint8_t version = STUDENTS_VER;
+    uint8_t version = STDNTS_VER;
 
     FILE *fd = fopen(fn, "wb");
 
@@ -67,7 +67,7 @@ int load_students(char *fn, students_t *students)
         goto fail;
 
     if ((err =
-        version != STUDENTS_VER
+        version != STDNTS_VER
         ? OLD_FORMAT : err) != OK)
         goto fail;
 

@@ -6,24 +6,17 @@
 
 inline uint8_t students_ver(void)
 {
-    return STUDENTS_VER;
-}
-
-int init_data_t(data_t *d)
-{
-    d->gender = MALE;
-    d->height = 140;
-    strcpy(d->name, "\0                   ");
-    strcpy(d->home.street, "\0                             ");
-    d->home.house = 0;
-    d->home.room = 0;
-
-    return OK;
+    return STDNTS_VER;
 }
 
 int init_student_t(student_t *s)
 {
-    init_data_t(&(s->data));
+    s->gender = MALE;
+    s->height = 140;
+    strcpy(s->name, "\0                   ");
+    strcpy(s->address.home.street, "\0                             ");
+    s->address.home.house = 0;
+    s->address.home.room = 0;
     s->housing = HOME;
 
     return OK;
@@ -68,7 +61,7 @@ int student_del(students_t *students, student_t student)
     students_item_t *sj;
 
     for (sj = students->b;
-         sj != NULL && sj->s.data.name != sc.s.data.name;
+         sj != NULL && sj->s.name != sc.s.name;
          si = sj, sj = sj->n);
 
     if (sj == students->b)
