@@ -29,13 +29,26 @@ int save_students(char *fn, students_t *students)
         ? IOERR : err) != OK)
         goto fail;
 
-    for (students_item_t *si = students->b;
+    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (int j = STDNTS_NDX_SLOT_CHUNK - 1; j >= 0; j--)
+        {
+            if ((students->ndx.slots[i] & ((uint64_t)1 << j)) == (uint64_t)1 << j)
+            {
+                if ((err =
+                             fwrite(&students->data[i * STDNTS_NDX_SLOT_CHUNK + j],
+                                    sizeof(student_t), 1, fd) != 1
+                             ? IOERR : err) != OK)
+                    goto fail;
+            }
+        }
+
+    /*for (students_item_t *si = students->b;
          si != NULL;
          si = si->n)
         if ((err =
             fwrite(&si->s, sizeof(si->s), 1, fd) != 1
             ? IOERR : err) != OK)
-            goto fail;
+            goto fail;*/
 
 //    EXCEPT(fail);
     fail:

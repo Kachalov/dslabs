@@ -30,6 +30,9 @@ int main(void)
     memcpy(student.name, "Vasya\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 20);
     student_add(&ss, student);
 
+    memcpy(student.name, "Viniamin\0\0\0\0\0\0\0\0\0\0\0\0", 20);
+    student_del(&ss, student);
+
     err = save_students("test.stud", &ss);
 //    err = load_students("test.stud", &ss);
 //    printf("%d\n", (int) ss.n);

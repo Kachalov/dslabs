@@ -4,8 +4,14 @@
 
 #define STDNTS_VER 2
 
+#define STDNTS_MAX 100
+#define STDNTS_NDX_SLOT_CHUNK 64
+#define STDNTS_NDX_SLOTS (STDNTS_MAX / STDNTS_NDX_SLOT_CHUNK + \
+                          STDNTS_MAX % STDNTS_NDX_SLOT_CHUNK != 0)
 #define STDNT_NAME_LEN 20
 #define STDNT_STREET_LEN 30
+
+typedef uint8_t students_len_t;
 
 typedef enum {
     HOME,
@@ -40,24 +46,25 @@ typedef struct
     } address;
 } student_t;
 
-typedef struct students_item_t
+typedef struct
 {
-    student_t s;
-    struct students_item_t *n;
-} students_item_t;
+    uint64_t slots[STDNTS_NDX_SLOTS];
+    students_len_t ss [STDNTS_MAX];
+} students_index_t;
 
 typedef struct
 {
-    size_t n;
-    students_item_t *b;
-    students_item_t *e;
+    students_len_t n;
+    student_t data[STDNTS_MAX];
+    students_index_t ndx;
 } students_t;
 #pragma pack(pop)
 
 int init_student_t(student_t *student);
 int init_students_t(students_t *students);
-int init_student_item_t(students_item_t *student);
+int init_students_index(students_index_t *ndx);
 uint8_t students_ver(void);
 
+int student_add_pos(students_t *students, students_len_t *pos);
 int student_add(students_t *students, student_t student);
 int student_del(students_t *students, student_t student);

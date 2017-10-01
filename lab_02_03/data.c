@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "data.h"
 #include "errors.h"
@@ -25,63 +26,71 @@ int init_student_t(student_t *s)
 int init_students_t(students_t *ss)
 {
     ss->n = 0;
-    ss->b = NULL;
-    ss->e = NULL;
+    init_students_index(&(ss->ndx));
+
+    return OK;
+}
+
+int init_students_index(students_index_t *ndx)
+{
+    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
+        ndx->slots[i] = 0;
 
     return OK;
 }
 
 int student_add(students_t *students, student_t student)
 {
-    students_item_t *si;
+    int err = OK;
+    students_len_t pos = 0;
 
-    si = malloc(sizeof(*si));
+    if ((err = student_add_pos(students, &pos)) != OK)
+        return err;
 
-    init_student_item_t(si);
-    si->s = student;
-
-    if (students->e != NULL)
-        students->e->n = si;
-    students->e = si;
+    students->data[pos] = student;
+    students->ndx.slots[pos / STDNTS_NDX_SLOT_CHUNK] |=
+            (uint64_t)1 << (pos % STDNTS_NDX_SLOT_CHUNK);
     students->n++;
+    students->ndx.ss[pos] = students->n;
 
-    if (students->b == NULL)
-        students->b = students->e;
-
-    return OK;
+    return err;
 }
 
 int student_del(students_t *students, student_t student)
 {
-    students_item_t sc;
-    init_student_item_t(&sc);
-    sc.s = student;
+    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (int j = STDNTS_NDX_SLOT_CHUNK - 1; j >= 0; j--)
+        {
+            if (((uint64_t)students->ndx.slots[i] & ((uint64_t)1 << j))
+                == ((uint64_t)1 << j))
+            {
+                printf("POS DEL %d %d\n", i, j);
+                if (strcmp(students->data[i * STDNTS_NDX_SLOT_CHUNK + j].name,
+                    student.name) == 0)
+                {
+                    students->ndx.slots[i] &=
+                            ~((uint64_t)1 << j);
+                    students->n--;
+                    return OK;
+                }
+            }
+        }
 
-    students_item_t *si = NULL;
-    students_item_t *sj;
-
-    for (sj = students->b;
-         sj != NULL && sj->s.name != sc.s.name;
-         si = sj, sj = sj->n);
-
-    if (sj == students->b)
-        students->b = si->n;
-
-    if (sj == students->e)
-        students->e = si;
-
-    if (si != NULL)
-        si->n = sj->n;
-
-    students->n--;
-
-    return OK;
+    return NOT_FOUND;
 }
 
-int init_student_item_t(students_item_t *student)
+int student_add_pos(students_t *students, students_len_t *pos)
 {
-    init_student_t(&(student->s));
-    student->n = NULL;
+    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (int j = STDNTS_NDX_SLOT_CHUNK - 1; j >= 0; j--)
+        {
+            if (((students->ndx.slots[i]) & ((uint64_t)1 << j)) == 0)
+            {
+                printf("POS %d %d\n", i, j);
+                *pos = i * STDNTS_NDX_SLOT_CHUNK + j;
+                return OK;
+            }
+        }
 
-    return OK;
+    return OOM;
 }
