@@ -14,8 +14,13 @@ int init_student_t(student_t *s)
 {
     s->gender = MALE;
     s->height = 140;
-    strcpy(s->name, "\0                   ");
-    strcpy(s->address.home.street, "\0                             ");
+
+    strcpy(s->name, "");
+    clear_str(s->name, STDNT_NAME_LEN);
+
+    strcpy(s->address.home.street, "");
+    clear_str(s->address.home.street, STDNT_STREET_LEN);
+
     s->address.home.house = 0;
     s->address.home.room = 0;
     s->housing = HOME;
@@ -50,8 +55,7 @@ int student_add(students_t *students, student_t student)
     students->data[pos] = student;
     students->ndx.slots[pos / STDNTS_NDX_SLOT_CHUNK] |=
             (uint64_t)1 << (pos % STDNTS_NDX_SLOT_CHUNK);
-    students->n++;
-    students->ndx.ss[pos] = students->n;
+    students->ndx.ss[pos] = pos;
 
     return err;
 }
@@ -64,7 +68,6 @@ int student_del(students_t *students, student_t student)
             if (((uint64_t)students->ndx.slots[i] & ((uint64_t)1 << j))
                 == ((uint64_t)1 << j))
             {
-                printf("POS DEL %d %d\n", i, j);
                 if (strcmp(students->data[i * STDNTS_NDX_SLOT_CHUNK + j].name,
                     student.name) == 0)
                 {
@@ -86,11 +89,38 @@ int student_add_pos(students_t *students, students_len_t *pos)
         {
             if (((students->ndx.slots[i]) & ((uint64_t)1 << j)) == 0)
             {
-                printf("POS %d %d\n", i, j);
                 *pos = i * STDNTS_NDX_SLOT_CHUNK + j;
                 return OK;
             }
         }
 
     return OOM;
+}
+
+void clear_str(char *str, size_t len)
+{
+    char *it = str;
+    int i = 0;
+
+    for (; i < len && *it != '\0'; it++, i++);
+
+    for(; i < len; it++, i++)
+        *it = '\0';
+}
+
+void print_students(students_t *students)
+{
+    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (int j = STDNTS_NDX_SLOT_CHUNK - 1; j >= 0; j--)
+            if (((students->ndx.slots[i]) & ((uint64_t)1 << j))
+            == (uint64_t)1 << j)
+            {
+                print_student(&students->data[
+                    students->ndx.ss[i * STDNTS_NDX_SLOT_CHUNK + j]]);
+            }
+}
+
+void print_student(student_t *student)
+{
+    printf("Name: %s Heigth: %d\n", student->name, student->height);
 }

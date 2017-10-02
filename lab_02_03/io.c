@@ -42,14 +42,6 @@ int save_students(char *fn, students_t *students)
             }
         }
 
-    /*for (students_item_t *si = students->b;
-         si != NULL;
-         si = si->n)
-        if ((err =
-            fwrite(&si->s, sizeof(si->s), 1, fd) != 1
-            ? IOERR : err) != OK)
-            goto fail;*/
-
 //    EXCEPT(fail);
     fail:
     if (fd != NULL)
@@ -88,6 +80,7 @@ int load_students(char *fn, students_t *students)
     {
         if ((err = student_add(students, student)) != OK)
             goto fail;
+        students->n++;
     }
 
     fail:

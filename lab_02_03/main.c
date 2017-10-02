@@ -23,19 +23,39 @@ int main(void)
     init_students_t(&ss);
     init_student_t(&student);
 
-    memcpy(student.name, "Ira\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" , 20);
-    student_add(&ss, student);
-    memcpy(student.name, "Viniamin\0\0\0\0\0\0\0\0\0\0\0\0", 20);
-    student_add(&ss, student);
-    memcpy(student.name, "Vasya\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 20);
-    student_add(&ss, student);
+    if (1)
+    {
+        strcpy(student.name, "Ira");
+        clear_str(student.name, STDNT_NAME_LEN);
+        student_add(&ss, student);
 
-    memcpy(student.name, "Viniamin\0\0\0\0\0\0\0\0\0\0\0\0", 20);
-    student_del(&ss, student);
+        strcpy(student.name, "Viniamin");
+        clear_str(student.name, STDNT_NAME_LEN);
+        student_add(&ss, student);
 
-    err = save_students("test.stud", &ss);
-//    err = load_students("test.stud", &ss);
-//    printf("%d\n", (int) ss.n);
+        strcpy(student.name, "Vasya");
+        student.height = 200;
+        clear_str(student.name, STDNT_NAME_LEN);
+        student_add(&ss, student);
+        student.height = 140;
+
+        strcpy(student.name, "Viniamin");
+        student_del(&ss, student);
+
+        strcpy(student.name, "User1");
+        clear_str(student.name, STDNT_NAME_LEN);
+        student_add(&ss, student);
+
+        strcpy(student.name, "User2");
+        clear_str(student.name, STDNT_NAME_LEN);
+        student_add(&ss, student);
+
+        err = save_students("test.stud", &ss);
+    }
+    else
+        err = load_students("test.stud", &ss);
+
+    print_students(&ss);
     printf("Err code: %d\n", err);
 
     return 0;
