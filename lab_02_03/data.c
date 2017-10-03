@@ -137,11 +137,8 @@ int cmp_students(student_t *a, student_t *b)
 
 inline students_len_t next_student(students_len_t ndx, students_t *s)
 {
-    //printf("next_ndx(%d)\n", ndx);
-
     if (ndx == s->n)
     {
-        //printf("NDX\n");
         if (s->n == 0)
             return 0;
         else
@@ -150,27 +147,21 @@ inline students_len_t next_student(students_len_t ndx, students_t *s)
     else if (ndx % STDNTS_NDX_SLOT_CHUNK == 0)
     {
         ndx += 2 * STDNTS_NDX_SLOT_CHUNK - 1;
-        //printf("!!!(%d, %d)\n", ndx / STDNTS_NDX_SLOT_CHUNK, ndx % STDNTS_NDX_SLOT_CHUNK);
     }
     else
     {
         ndx--;
     }
 
-    //printf("next_ndx_new(%d)\n", ndx);
-
     for (int i = ndx / STDNTS_NDX_SLOT_CHUNK; i < STDNTS_NDX_SLOTS; i++)
         for (int j = ndx % STDNTS_NDX_SLOT_CHUNK; j >= 0; j--)
         {
-            //printf("NEXT(%d, %d)\n", i, j);
             if (((s->ndx.slots[i]) & ((uint64_t)1 << j))
             == (uint64_t)1 << j)
             {
-                //printf("next(%d)\n", i * STDNTS_NDX_SLOT_CHUNK + j);
                 return i * STDNTS_NDX_SLOT_CHUNK + j;
             }
         }
-    //printf("next(%d)\n", s->n);
     return s->n;
 }
 
@@ -196,7 +187,6 @@ tick_t sort_students(students_t *students)
                 #endif
             }
 
-    //printf("=========\n");
     return total;
 }
 
