@@ -2,16 +2,17 @@
 
 #include <inttypes.h>
 
+#include "time.h"
+
 #define STDNTS_VER 2
 
-#define STDNTS_MAX 100
-#define STDNTS_NDX_SLOT_CHUNK 64
-#define STDNTS_NDX_SLOTS (STDNTS_MAX / STDNTS_NDX_SLOT_CHUNK + \
-                          STDNTS_MAX % STDNTS_NDX_SLOT_CHUNK != 0)
+#define STDNTS_NDX_SLOT_CHUNK 64 //uint64_t
+#define STDNTS_NDX_SLOTS 64
+#define STDNTS_MAX (STDNTS_NDX_SLOTS * STDNTS_NDX_SLOT_CHUNK)
 #define STDNT_NAME_LEN 20
 #define STDNT_STREET_LEN 30
 
-typedef uint8_t students_len_t;
+typedef uint16_t students_len_t;
 
 typedef enum {
     HOME,
@@ -71,5 +72,16 @@ int student_del(students_t *students, student_t student);
 
 void print_students(students_t *students);
 void print_student(student_t *student);
+
+tick_t sort_students(students_t *students);
+
+int cmp_students(student_t *a, student_t *b);
+students_len_t next_student(students_len_t ndx, students_t *s);
+student_t *get_student(students_len_t ndx, students_t *students);
+
+tick_t swap_student_ndx(students_t *students,
+    students_len_t i, students_len_t j);
+tick_t swap_student_data(students_t *students,
+    students_len_t i, students_len_t j);
 
 void clear_str(char *str, size_t len);
