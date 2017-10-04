@@ -29,8 +29,8 @@ int save_students(char *fn, students_t *students)
         ? IOERR : err) != OK)
         goto fail;
 
-    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
-        for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
+    for (ndx_pos_t i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (ndx_pos_t j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
             if ((students->ndx.slots[i] & ((uint64_t)1 << j)) == (uint64_t)1 << j)
             {

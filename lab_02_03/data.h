@@ -15,6 +15,10 @@
 typedef uint16_t students_len_t;
 typedef uint64_t slots_t;
 
+typedef students_len_t ndx_pos_t;
+typedef students_len_t data_pos_t;
+
+#pragma pack(push, 1)
 typedef enum {
     HOME,
     HOSTEL
@@ -25,7 +29,6 @@ typedef enum {
     FEMALE
 } gender_t;
 
-#pragma pack(push, 1)
 typedef struct
 {
     housing_t housing;
@@ -51,7 +54,7 @@ typedef struct
 typedef struct
 {
     slots_t slots[STDNTS_NDX_SLOTS];
-    students_len_t ss [STDNTS_MAX];
+    data_pos_t ss [STDNTS_MAX];
 } students_index_t;
 
 typedef struct
@@ -65,10 +68,10 @@ typedef struct
 
 int init_student_t(student_t *student);
 int init_students_t(students_t *students);
-int init_students_index(students_index_t *ndx);
+int init_students_index_t(students_index_t *ndx);
 uint8_t students_ver(void);
 
-int student_add_pos(students_t *students, students_len_t *pos);
+int student_add_pos(students_t *students, ndx_pos_t *pos);
 int student_add(students_t *students, student_t student);
 int student_del(students_t *students, student_t student);
 
@@ -78,8 +81,8 @@ void print_student(student_t *student);
 tick_t sort_students(students_t *students);
 
 int cmp_students(student_t *a, student_t *b);
-students_len_t next_student(students_len_t ndx, students_t *s);
-student_t *get_student(students_len_t ndx, students_t *students);
+ndx_pos_t next_student(ndx_pos_t ndx, students_t *s);
+student_t *get_student(ndx_pos_t ndx, students_t *students);
 
 tick_t swap_student_ndx(students_t *students,
     students_len_t i, students_len_t j);

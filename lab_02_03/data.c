@@ -33,12 +33,12 @@ int init_students_t(students_t *ss)
 {
     ss->n = 0;
     ss->n_empty = 0;
-    init_students_index(&(ss->ndx));
+    init_students_index_t(&(ss->ndx));
 
     return OK;
 }
 
-int init_students_index(students_index_t *ndx)
+int init_students_index_t(students_index_t *ndx)
 {
     for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
         ndx->slots[i] = 0;
@@ -49,7 +49,7 @@ int init_students_index(students_index_t *ndx)
 int student_add(students_t *students, student_t student)
 {
     int err = OK;
-    students_len_t pos = 0;
+    ndx_pos_t pos = 0;
 
     if ((err = student_add_pos(students, &pos)) != OK)
         return err;
@@ -88,7 +88,7 @@ int student_del(students_t *students, student_t student)
     return NOT_FOUND;
 }
 
-int student_add_pos(students_t *students, students_len_t *pos)
+int student_add_pos(students_t *students, ndx_pos_t *pos)
 {
     for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
         for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
@@ -117,7 +117,7 @@ void clear_str(char *str, size_t len)
 void print_students(students_t *students)
 {
     students_len_t num = 0;
-    for (int i = next_student(students->n + students->n_empty, students);
+    for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
          i != students->n + students->n_empty; i = next_student(i, students))
     {
         printf("%d ndx{%d})\t", ++num, students->ndx.ss[i]);
@@ -139,7 +139,7 @@ int cmp_students(student_t *a, student_t *b)
     return a->height - b->height;
 }
 
-inline students_len_t next_student(students_len_t ndx, students_t *s)
+inline ndx_pos_t next_student(ndx_pos_t ndx, students_t *s)
 {
     if (ndx == s->n + s->n_empty)
     {
@@ -153,8 +153,8 @@ inline students_len_t next_student(students_len_t ndx, students_t *s)
         ndx++;
     }
 
-    for (int i = ndx / STDNTS_NDX_SLOT_CHUNK; i < STDNTS_NDX_SLOTS; i++)
-        for (int j = ndx % STDNTS_NDX_SLOT_CHUNK; j < STDNTS_NDX_SLOT_CHUNK; j++)
+    for (ndx_pos_t i = ndx / STDNTS_NDX_SLOT_CHUNK; i < STDNTS_NDX_SLOTS; i++)
+        for (ndx_pos_t j = ndx % STDNTS_NDX_SLOT_CHUNK; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
             if (((s->ndx.slots[i]) & ((uint64_t)1 << j))
             == (uint64_t)1 << j)
@@ -165,7 +165,7 @@ inline students_len_t next_student(students_len_t ndx, students_t *s)
     return s->n + s->n_empty;
 }
 
-inline student_t *get_student(students_len_t ndx, students_t *students)
+inline student_t *get_student(ndx_pos_t ndx, students_t *students)
 {
     return &(students->data[students->ndx.ss[ndx]]);
 }
@@ -174,9 +174,9 @@ tick_t sort_students(students_t *students)
 {
     tick_t total = 0;
 
-    for (int i = next_student(students->n + students->n_empty, students);
+    for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
          i != students->n + students->n_empty; i = next_student(i, students))
-        for (int j = next_student(i, students);
+        for (ndx_pos_t j = next_student(i, students);
              j != students->n + students->n_empty; j = next_student(j, students))
         {
             if (cmp_students(get_student(i, students), get_student(j, students)) > 0)
@@ -192,8 +192,7 @@ tick_t sort_students(students_t *students)
     return total;
 }
 
-tick_t swap_student_ndx(students_t *students,
-    students_len_t i, students_len_t j)
+tick_t swap_student_ndx(students_t *students, ndx_pos_t i, ndx_pos_t j)
 {
     tick_t a, b;
 
@@ -206,8 +205,7 @@ tick_t swap_student_ndx(students_t *students,
     return b - a;
 }
 
-tick_t swap_student_data(students_t *students,
-    students_len_t i, students_len_t j)
+tick_t swap_student_data(students_t *students, ndx_pos_t i, ndx_pos_t j)
 {
     tick_t a, b;
     student_t stmp;
