@@ -30,7 +30,7 @@ int save_students(char *fn, students_t *students)
         goto fail;
 
     for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
-        for (int j = STDNTS_NDX_SLOT_CHUNK - 1; j >= 0; j--)
+        for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
             if ((students->ndx.slots[i] & ((uint64_t)1 << j)) == (uint64_t)1 << j)
             {

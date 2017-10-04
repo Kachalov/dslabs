@@ -1,5 +1,7 @@
 #pragma once
 
-typedef unsigned long long tick_t;
+#include <inttypes.h>
+
+typedef uint64_t tick_t;
 
 tick_t tick(void);

@@ -47,12 +47,14 @@ void gen_student(student_t *s)
 
     clear_str(s->name, STDNT_NAME_LEN);
     s->height = 160 + (rand() + 8) % 41;
+
+    sprintf(s->name, "%d", s->height);
 }
 
 int main(void)
 {
     int err = OK;
-    tick_t sort_time;
+    tick_t sort_time = 0;
 
     srand(time(NULL));
 
@@ -96,12 +98,18 @@ int main(void)
         clear_str(student.name, STDNT_NAME_LEN);
         student_add(&ss, student);
 
-        for (int i = 0; i < 629 - 4; i++)
+        strcpy(student.name, "User1");
+        student_del(&ss, student);
+
         {
-            gen_student(&student);
-            err = student_add(&ss, student);
-            if (err != OK)
-                printf("ERR: %d on %d\n", err, ss.n);
+            int num = ss.n;
+            for (int i = 0; i < 10 - num; i++)
+            {
+                gen_student(&student);
+                err = student_add(&ss, student);
+                if (err != OK)
+                    printf("ERR: %d on %d\n", err, ss.n);
+            }
         }
 
         err = save_students("test.stud", &ss);
@@ -114,6 +122,11 @@ int main(void)
     printf("========== Students ==========\n");
     print_students(&ss);
     printf("========== %d students ==========\n", ss.n);
+    #ifdef SORT_NDX
+        printf("Sort type: index\n");
+    #else
+        printf("Sort type: data\n");
+    #endif
     printf("Sort ticks: %"PRIu64"\n", sort_time);
     printf("Err code: %d\n", err);
 

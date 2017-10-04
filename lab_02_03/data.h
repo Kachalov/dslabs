@@ -6,13 +6,14 @@
 
 #define STDNTS_VER 2
 
-#define STDNTS_NDX_SLOT_CHUNK 64 //uint64_t
+#define STDNTS_NDX_SLOT_CHUNK 64 // bits in slots_t
 #define STDNTS_NDX_SLOTS 64
 #define STDNTS_MAX (STDNTS_NDX_SLOTS * STDNTS_NDX_SLOT_CHUNK)
 #define STDNT_NAME_LEN 20
 #define STDNT_STREET_LEN 30
 
 typedef uint16_t students_len_t;
+typedef uint64_t slots_t;
 
 typedef enum {
     HOME,
@@ -49,13 +50,14 @@ typedef struct
 
 typedef struct
 {
-    uint64_t slots[STDNTS_NDX_SLOTS];
+    slots_t slots[STDNTS_NDX_SLOTS];
     students_len_t ss [STDNTS_MAX];
 } students_index_t;
 
 typedef struct
 {
     students_len_t n;
+    students_len_t n_empty;
     student_t data[STDNTS_MAX];
     students_index_t ndx;
 } students_t;
