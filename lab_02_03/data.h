@@ -3,11 +3,12 @@
 #include <inttypes.h>
 
 #include "time.h"
+#include "bits.h"
 
-#define STDNTS_VER 2
+#define STDNTS_VER 3
 
-#define STDNTS_NDX_SLOT_CHUNK 64 // bits in slots_t
-#define STDNTS_NDX_SLOTS 64
+#define STDNTS_NDX_SLOT_CHUNK BITMASK_CHUNK // bits in slots_t
+#define STDNTS_NDX_SLOTS BITMASK_SLOTS
 #define STDNTS_MAX (STDNTS_NDX_SLOTS * STDNTS_NDX_SLOT_CHUNK)
 #define STDNT_NAME_LEN 20
 #define STDNT_STREET_LEN 30
@@ -29,12 +30,13 @@ typedef enum {
     FEMALE
 } gender_t;
 
+#pragma pack(push, 2)
 typedef struct
 {
     housing_t housing;
     gender_t gender;
-    uint8_t height;
     char name[STDNT_NAME_LEN + 1];
+    uint8_t height;
     union
     {
         struct
@@ -50,6 +52,7 @@ typedef struct
         } hostel;
     } address;
 } student_t;
+#pragma pack(pop)
 
 typedef struct
 {
@@ -79,6 +82,7 @@ void print_students(students_t *students);
 void print_student(student_t *student);
 
 tick_t sort_students(students_t *students);
+tick_t compress_students(students_t *students);
 
 int cmp_students(student_t *a, student_t *b);
 ndx_pos_t next_student(ndx_pos_t ndx, students_t *s);

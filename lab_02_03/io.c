@@ -3,7 +3,7 @@
 
 #include "io.h"
 #include "data.h"
-
+#include "bits.h"
 #include "errors.h"
 
 #define TRY(f, ex, t, e, g) {if ((e = (f) != (ex) ? (t) : e) != OK) goto g;}
@@ -12,7 +12,7 @@
 int save_students(char *fn, students_t *students)
 {
     int err = OK;
-    uint8_t version = STDNTS_VER;
+    uint64_t version = STDNTS_VER;
 
     FILE *fd = fopen(fn, "wb");
 
@@ -29,18 +29,15 @@ int save_students(char *fn, students_t *students)
         ? IOERR : err) != OK)
         goto fail;
 
-    for (ndx_pos_t i = 0; i < STDNTS_NDX_SLOTS; i++)
-        for (ndx_pos_t j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
-        {
-            if ((students->ndx.slots[i] & ((uint64_t)1 << j)) == (uint64_t)1 << j)
-            {
-                if ((err =
-                             fwrite(&students->data[i * STDNTS_NDX_SLOT_CHUNK + j],
-                                    sizeof(student_t), 1, fd) != 1
-                             ? IOERR : err) != OK)
-                    goto fail;
-            }
-        }
+    for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
+         i != students->n + students->n_empty; i = next_student(i, students))
+    {
+        if ((err =
+             fwrite(get_student(i, students),
+                    sizeof(student_t), 1, fd) != 1
+             ? IOERR : err) != OK)
+            goto fail;
+    }
 
 //    EXCEPT(fail);
     fail:
@@ -56,7 +53,7 @@ int save_students(char *fn, students_t *students)
 int load_students(char *fn, students_t *students)
 {
     int err = OK;
-    uint8_t version = 0;
+    uint64_t version = 0;
     student_t student;
 
     FILE *fd = fopen(fn, "rb");
@@ -80,7 +77,6 @@ int load_students(char *fn, students_t *students)
     {
         if ((err = student_add(students, student)) != OK)
             goto fail;
-        students->n++;
     }
 
     fail:

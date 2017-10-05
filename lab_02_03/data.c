@@ -1,10 +1,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "data.h"
 #include "errors.h"
 #include "time.h"
+#include "bits.h"
 
 inline uint8_t students_ver(void)
 {
@@ -55,8 +57,7 @@ int student_add(students_t *students, student_t student)
         return err;
 
     students->data[pos] = student;
-    students->ndx.slots[pos / STDNTS_NDX_SLOT_CHUNK] |=
-            (uint64_t)1 << (pos % STDNTS_NDX_SLOT_CHUNK);
+    set_bit(students->ndx.slots, pos, true);
     students->ndx.ss[pos] = pos;
     students->n++;
     if (students->n_empty > 0)
@@ -70,14 +71,12 @@ int student_del(students_t *students, student_t student)
     for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
         for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
-            if (((uint64_t)students->ndx.slots[i] & ((uint64_t)1 << j))
-                == ((uint64_t)1 << j))
+            if (get_bit(students->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j))
             {
                 if (strcmp(students->data[i * STDNTS_NDX_SLOT_CHUNK + j].name,
                     student.name) == 0)
                 {
-                    students->ndx.slots[i] &=
-                            ~((uint64_t)1 << j);
+                    set_bit(students->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j, false);
                     students->n--;
                     students->n_empty++;
                     return OK;
@@ -93,7 +92,7 @@ int student_add_pos(students_t *students, ndx_pos_t *pos)
     for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
         for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
-            if (((students->ndx.slots[i]) & ((uint64_t)1 << j)) == 0)
+            if (!get_bit(students->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j))
             {
                 *pos = i * STDNTS_NDX_SLOT_CHUNK + j;
                 return OK;
@@ -121,8 +120,7 @@ void print_students(students_t *students)
          i != students->n + students->n_empty; i = next_student(i, students))
     {
         printf("%d ndx{%d})\t", ++num, students->ndx.ss[i]);
-        print_student(&students->data[
-            students->ndx.ss[i]]);
+        print_student(get_student(i, students));
     }
 }
 
@@ -156,8 +154,7 @@ inline ndx_pos_t next_student(ndx_pos_t ndx, students_t *s)
     for (ndx_pos_t i = ndx / STDNTS_NDX_SLOT_CHUNK; i < STDNTS_NDX_SLOTS; i++)
         for (ndx_pos_t j = ndx % STDNTS_NDX_SLOT_CHUNK; j < STDNTS_NDX_SLOT_CHUNK; j++)
         {
-            if (((s->ndx.slots[i]) & ((uint64_t)1 << j))
-            == (uint64_t)1 << j)
+            if (get_bit(s->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j))
             {
                 return i * STDNTS_NDX_SLOT_CHUNK + j;
             }
@@ -191,6 +188,38 @@ tick_t sort_students(students_t *students)
 
     return total;
 }
+
+tick_t compress_students(students_t *students)
+{
+    tick_t a, b;
+    ndx_pos_t ndx = 0;
+    ndx_pos_t offset = 0;
+
+    a = tick();
+    for (ndx_pos_t i = 0; i < STDNTS_NDX_SLOTS; i++)
+        for (ndx_pos_t j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
+        {
+            ndx = i * STDNTS_NDX_SLOT_CHUNK + j;
+            if (get_bit(students->ndx.slots, ndx))
+            {
+                if (offset != 0)
+                {
+                    memcpy(get_student(ndx - offset, students), get_student(ndx, students), sizeof(student_t));
+                    set_bit(students->ndx.slots, ndx - offset, get_bit(students->ndx.slots, ndx));
+                    set_bit(students->ndx.slots, ndx, false);
+                    students->ndx.ss[ndx - offset] = ndx - offset;
+                }
+            }
+            else
+            {
+                offset++;
+            }
+        }
+    b = tick();
+
+    return b - a;
+}
+
 
 tick_t swap_student_ndx(students_t *students, ndx_pos_t i, ndx_pos_t j)
 {

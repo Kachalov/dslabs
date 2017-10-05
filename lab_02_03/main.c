@@ -10,6 +10,7 @@
 #include "data.h"
 #include "io.h"
 #include "errors.h"
+#include "bits.h"
 
 void gen_student(student_t *s)
 {
@@ -47,18 +48,15 @@ void gen_student(student_t *s)
 
     clear_str(s->name, STDNT_NAME_LEN);
     s->height = 160 + (rand() + 8) % 41;
-
-    sprintf(s->name, "%d", s->height);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
     int err = OK;
     tick_t sort_time = 0;
 
     srand(time(NULL));
 
-    printf("housing_t: %lu\n", sizeof(housing_t));
     printf("student_t: %lu\n", sizeof(student_t));
     printf("students_t: %lu\n", sizeof(students_t));
 
@@ -68,7 +66,7 @@ int main(void)
     init_students_t(&ss);
     init_student_t(&student);
 
-    if (1)
+    if (argc > 1 && strcmp(argv[1], "save") == 0)
     {
         strcpy(student.name, "Ira");
         student.height = 170;
