@@ -48,6 +48,7 @@ void gen_student(student_t *s)
 
     clear_str(s->name, STDNT_NAME_LEN);
     s->height = 160 + (rand() + 8) % 41;
+    s->housing = rand() % 2 ? HOME : HOSTEL;
 }
 
 int main(int argc, char* argv[])
@@ -101,7 +102,7 @@ int main(int argc, char* argv[])
 
         {
             int num = ss.n;
-            for (int i = 0; i < 10 - num; i++)
+            for (int i = 0; i < 1000 - num; i++)
             {
                 gen_student(&student);
                 err = student_add(&ss, student);
@@ -120,10 +121,22 @@ int main(int argc, char* argv[])
     printf("========== Students ==========\n");
     print_students(&ss);
     printf("========== %d students ==========\n", ss.n);
+
+    printf("\n");
+
+    printf("========== Students in hostel ==========\n");
+    print_hostel_students(&ss);
+    printf("========== Students in hostel ==========\n");
+
     #ifdef SORT_NDX
         printf("Sort type: index\n");
     #else
         printf("Sort type: data\n");
+    #endif
+    #ifdef SORT_QSORT
+        printf("Sort alg: qsort\n");
+    #else
+        printf("Sort alg: bubble\n");
     #endif
     printf("Sort ticks: %"PRIu64"\n", sort_time);
     printf("Err code: %d\n", err);

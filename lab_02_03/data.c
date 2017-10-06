@@ -8,6 +8,8 @@
 #include "time.h"
 #include "bits.h"
 
+students_t *cur_students = NULL;
+
 inline uint8_t students_ver(void)
 {
     return STDNTS_VER;
@@ -124,17 +126,57 @@ void print_students(students_t *students)
     }
 }
 
+void print_hostel_students(students_t *students)
+{
+    students_len_t num = 0;
+    for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
+         i != students->n + students->n_empty && get_student(i, students)->housing == HOSTEL;
+         i = next_student(i, students))
+    {
+        printf("%d ndx{%d})\t", ++num, students->ndx.ss[i]);
+        print_student(get_student(i, students));
+    }
+}
+
 void print_student(student_t *student)
 {
     printf("%s", student->name);
     for (int i = 0; i < (40 - strlen(student->name)) / 8; i++)
         printf("\t");
-    printf("H: %d\n", student->height);
+    printf("H: %d\t", student->height);
+    printf("H: %s\n", student->housing == HOME ? "home" : "hostel");
 }
 
 int cmp_students(student_t *a, student_t *b)
 {
-    return a->height - b->height;
+    int r = 0;
+
+    if (a->housing == HOSTEL && b->housing == HOME)
+        return -1;
+    else if (a->housing == HOME && b->housing == HOSTEL)
+        return 1;
+
+    r = strcmp(a->name, b->name);
+    if (r != 0)
+        return r;
+
+    return (int)a->height - b->height;
+}
+
+int cmp_students_ndx(const void *a, const void *b)
+{
+    data_pos_t p1 = *(data_pos_t *)a;
+    data_pos_t p2 = *(data_pos_t *)b;
+
+    return cmp_students(&cur_students->data[p1], &cur_students->data[p2]);
+}
+
+int cmp_students_data(const void *a, const void *b)
+{
+    student_t *s1 = (student_t *)a;
+    student_t *s2 = (student_t *)b;
+
+    return cmp_students(s1, s2);
 }
 
 inline ndx_pos_t next_student(ndx_pos_t ndx, students_t *s)
@@ -167,7 +209,34 @@ inline student_t *get_student(ndx_pos_t ndx, students_t *students)
     return &(students->data[students->ndx.ss[ndx]]);
 }
 
-tick_t sort_students(students_t *students)
+inline tick_t sort_students(students_t *students)
+{
+    #ifdef SORT_QSORT
+        cur_students = students;
+        return sort_students_qsort(students);
+    #else
+        return sort_students_bubble(students);
+    #endif
+}
+
+tick_t sort_students_qsort(students_t *students)
+{
+    tick_t a, b;
+
+    compress_students(students);
+
+    a = tick();
+    #ifdef SORT_NDX
+        qsort(students->ndx.ss, students->n, sizeof(data_pos_t), cmp_students_ndx);
+    #else
+        qsort(students->data, students->n, sizeof(student_t), cmp_students_data);
+    #endif
+    b = tick();
+
+    return b - a;
+}
+
+tick_t sort_students_bubble(students_t *students)
 {
     tick_t total = 0;
 
@@ -212,6 +281,7 @@ tick_t compress_students(students_t *students)
             }
             else
             {
+                students->n_empty--;
                 offset++;
             }
         }

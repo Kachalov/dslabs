@@ -79,12 +79,18 @@ int student_add(students_t *students, student_t student);
 int student_del(students_t *students, student_t student);
 
 void print_students(students_t *students);
+void print_hostel_students(students_t *students);
 void print_student(student_t *student);
 
 tick_t sort_students(students_t *students);
+tick_t sort_students_bubble(students_t *students);
+tick_t sort_students_qsort(students_t *students);
 tick_t compress_students(students_t *students);
 
 int cmp_students(student_t *a, student_t *b);
+int cmp_students_ndx(const void *a, const void *b);
+int cmp_students_data(const void *a, const void *b);
+
 ndx_pos_t next_student(ndx_pos_t ndx, students_t *s);
 student_t *get_student(ndx_pos_t ndx, students_t *students);
 
