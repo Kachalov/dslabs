@@ -122,7 +122,7 @@ class AddressDatabase(object):
         lib.student_del(byref(self.ss),
                         lib.get_student(record_id, byref(self.ss)).contents)
 
-    def list_all_records(self, ):
+    def list_all_records(self):
         res = []
 
         lib.next_student.restype = c_uint16

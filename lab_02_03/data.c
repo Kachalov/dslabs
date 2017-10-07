@@ -70,22 +70,6 @@ int student_add(students_t *students, student_t student)
 
 int student_del(students_t *students, student_t student)
 {
-    for (int i = 0; i < STDNTS_NDX_SLOTS; i++)
-        for (int j = 0; j < STDNTS_NDX_SLOT_CHUNK; j++)
-        {
-            if (get_bit(students->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j))
-            {
-                if (strcmp(students->data[i * STDNTS_NDX_SLOT_CHUNK + j].name,
-                    student.name) == 0)
-                {
-                    set_bit(students->ndx.slots, i * STDNTS_NDX_SLOT_CHUNK + j, false);
-                    students->n--;
-                    students->n_empty++;
-                    return OK;
-                }
-            }
-        }
-
     for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
          i != students->n + students->n_empty; i = next_student(i, students))
     {
@@ -195,10 +179,7 @@ inline ndx_pos_t next_student(ndx_pos_t ndx, students_t *s)
 {
     if (ndx == s->n + s->n_empty)
     {
-        if (s->n == 0)
-            return 0;
-        else
-            ndx = 0;
+        ndx = 0;
     }
     else
     {
