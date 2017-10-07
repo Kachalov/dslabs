@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
         {
             int num = ss.n;
-            for (int i = 0; i < 1000 - num; i++)
+            for (int i = 0; i < 100 - num; i++)
             {
                 gen_student(&student);
                 err = student_add(&ss, student);

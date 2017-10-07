@@ -86,6 +86,18 @@ int student_del(students_t *students, student_t student)
             }
         }
 
+    for (ndx_pos_t i = next_student(students->n + students->n_empty, students);
+         i != students->n + students->n_empty; i = next_student(i, students))
+    {
+        if (cmp_students(get_student(i, students), &student) == 0)
+        {
+            set_bit(students->ndx.slots, i, false);
+            students->n--;
+            students->n_empty++;
+            return OK;
+        }
+    }
+
     return NOT_FOUND;
 }
 

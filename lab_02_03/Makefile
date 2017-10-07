@@ -17,6 +17,10 @@ ifeq ($(sort), index)
 	CFLAGS += -DSORT_NDX
 endif
 
+ifeq ($(MAKECMDGOALS), main.so)
+	CFLAGS += -shared -fpic
+endif
+
 ifeq ($(sort_alg), qsort)
 	CFLAGS += -DSORT_QSORT
 endif
@@ -30,8 +34,8 @@ test.exe: $(OBJS) test.o
 %.o: %.c *.h
 	$(CC) $(CFLAGS) -c $<
 
-main.so:
-	$(CC) -shared -fpic $(CFLAGS) $^ -o $@
+main.so: $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -f *.exe *.gcda *.gcno *.o
+	rm -f *.exe *.gcda *.gcno *.o *.so
