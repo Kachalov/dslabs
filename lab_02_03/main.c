@@ -102,7 +102,10 @@ int main(int argc, char* argv[])
 
         {
             int num = ss.n;
-            for (int i = 0; i < 100 - num; i++)
+            int max = 100;
+            if (argc > 2)
+                sscanf(argv[2], "%d", &max);
+            for (int i = 0; i < max - num; i++)
             {
                 gen_student(&student);
                 err = student_add(&ss, student);
@@ -139,6 +142,7 @@ int main(int argc, char* argv[])
         printf("Sort alg: bubble\n");
     #endif
     printf("Sort ticks: %"PRIu64"\n", sort_time);
+    printf("Total students: %d\n", ss.n);
     printf("Err code: %d\n", err);
 
     return 0;
