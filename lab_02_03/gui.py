@@ -106,17 +106,27 @@ class AddressDatabase(object):
         lib.load_students(c_char_p(self.fn.encode("utf-8")),
                                 byref(self.ss))
 
-    def add_record(self, name, height):
+    def add_record(self, **kwargs):
         student = student_t()
         lib.init_student_t(byref(student))
-        student.name = name.encode("utf-8")
-        student.height = c_uint8(int(height))
+
+        student.name = kwargs.get("name", "").encode("utf-8")
+        student.height = c_uint8(int(kwargs.get("height", 160)))
         lib.clear_str(student.name, STDNT_NAME_LEN)
+        student.housing = int(kwargs.get("housing", "0"))
+        if (student.housing == housing_t.HOME):
+            student.address.home.street = kwargs.get("street", "").encode("utf-8")
+            student.address.home.house = int(kwargs.get("house", "0"))
+            student.address.home.room = int(kwargs.get("room", "0"))
+        else:
+            student.address.hostel.house = int(kwargs.get("house", "0"))
+            student.address.hostel.room = int(kwargs.get("room", "0"))
+
         lib.student_add(byref(self.ss), student)
 
-    def update_record(self, record_id, name, height):
+    def update_record(self, record_id, **kwargs):
         self.delete_record(record_id)
-        self.add_record(name, height)
+        self.add_record(**kwargs)
 
     def delete_record(self, record_id):
         lib.student_del(byref(self.ss),
@@ -150,6 +160,12 @@ class AddressDatabase(object):
             height=s.height,
             gender=gender_t.values[s.gender],
             housing=housing_t.values[s.housing],
+            street='' if s.housing == housing_t.HOSTEL else
+                   s.address.home.street.decode("utf-8"),
+            house=s.address.hostel.house if s.housing == housing_t.HOSTEL else
+                  s.address.home.house,
+            room=s.address.hostel.room if s.housing == housing_t.HOSTEL else
+                 s.address.home.room,
         )
 
     def save(self):
@@ -171,9 +187,13 @@ class RecordList(npyscreen.MultiLineAction):
         })
 
     def display_value(self, vl):
-        return ("id{0.record_id:03d} {0.name:<30s} {0.housing:<10s} "
-                "{0.height:>3d} "
-                " {0.gender:>6s}").format(vl)
+        try:
+            return ("id{0.record_id:03d} {0.name:<20s} {0.housing:<6s} "
+                    "{0.height:>3d} "
+                    "{0.gender:>6s} {0.street:>30s} {0.house:>2d} "
+                    "{0.room:>2d}").format(vl)
+        except:
+            raise TypeError(vl)
 
     def actionHighlighted(self, act_on_this, keypress):
         self.parent.parentApp.getForm('EDITRECORDFM').value = act_on_this.record_id
@@ -206,11 +226,41 @@ class RecordListDisplay(npyscreen.FormMutt):
         self.wMain.display()
 
 
+class Slider(npyscreen.Slider):
+    def translate_value(self):
+        stri = "%d / %d" % (self.value + 160, self.out_of + 160)
+        if isinstance(stri, bytes):
+            stri = stri.decode(self.encoding, 'replace')
+        l = (len(str(self.out_of))) * 2 + 4
+        stri = stri.rjust(l)
+        return stri
+
+
+class TitleSlider(npyscreen.TitleSlider):
+    _entry_type = Slider
+
+
 class EditRecord(npyscreen.ActionForm):
     def create(self):
         self.value = None
-        self.s_name = self.add(npyscreen.TitleText, name="Name:",)
-        self.height = self.add(npyscreen.TitleText, name="Height:")
+        self.s_name = self.add(npyscreen.TitleText, name="Name:")
+        self.height = self.add(TitleSlider, name="Height:",
+                               lowest=0, out_of=40, label=True)
+        self.gender = self.add(npyscreen.TitleSelectOne, name="Gender:",
+                               values=["Male", "Female"], value=[0],
+                               max_height=3, scroll_exit=True)
+        self.housing = self.add(npyscreen.TitleSelectOne, name="Housing:",
+                                values=["Home", "Hostel"], value=[0],
+                                max_height=3, scroll_exit=True)
+
+        self.street = self.add(npyscreen.TitleText, name="Street:")
+        self.house = self.add(npyscreen.TitleText, name="House:")
+        self.room = self.add(npyscreen.TitleText, name="Room:")
+
+    def while_editing(self, *args, **keywords):
+        self.street.editable = self.housing.value[0] == housing_t.HOME
+        self.street.update()
+        super(self.__class__, self).while_editing(self, *args, **keywords)
 
     def beforeEditing(self):
         if self.value is not None:
@@ -218,24 +268,39 @@ class EditRecord(npyscreen.ActionForm):
             self.name = "Record id : %s" % record.record_id
             self.record_id = record.record_id
             self.s_name.value = record.name
-            self.height.value = str(record.height)
+            self.height.value = record.height - 160
+            self.gender.value = gender_t.values.index(record.gender)
+            self.housing.value = housing_t.values.index(record.housing)
+            self.street.value = record.street
+            self.house.value = str(record.house)
+            self.room.value = str(record.room)
         else:
             self.name = "New Record"
-            self.record_id = ''
-            self.s_name.value = ''
-            self.height.value = ''
+            self.height.value = 0
+            self.gender.value = gender_t.MALE
+            self.housing.value = housing_t.HOME
 
     def on_ok(self):
-        if self.record_id: # We are editing an existing record
+        if self.record_id:
             self.parentApp.myDatabase.update_record(
                 self.record_id,
                 name=self.s_name.value,
-                height=self.height.value,
+                height=self.height.value + 160,
+                gender=self.gender.value[0],
+                housing=self.housing.value[0],
+                street=self.street.value,
+                house=self.house.value,
+                room=self.room.value,
             )
-        else: # We are adding a new record.
+        else:
             self.parentApp.myDatabase.add_record(
                 name=self.s_name.value,
-                height=self.height.value,
+                height=self.height.value + 160,
+                gender=self.gender.value[0],
+                housing=self.housing.value[0],
+                street=self.street.value,
+                house=self.house.value,
+                room=self.room.value,
             )
         self.parentApp.switchFormPrevious()
 
