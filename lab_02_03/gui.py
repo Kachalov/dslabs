@@ -98,7 +98,7 @@ class students_t(Structure):
     ]
 
 
-class AddressDatabase(object):
+class StudentsDatabase(object):
     def __init__(self):
         self.fn = sys.argv[1] if len(sys.argv) > 1 else "test.stud"
         self.ss = students_t()
@@ -114,7 +114,7 @@ class AddressDatabase(object):
         student.height = c_uint8(int(kwargs.get("height", 160)))
         lib.clear_str(student.name, STDNT_NAME_LEN)
         student.housing = int(kwargs.get("housing", "0"))
-        if (student.housing == housing_t.HOME):
+        if student.housing == housing_t.HOME:
             student.address.home.street = kwargs.get(
                 "street", "").encode("utf-8")[:STDNT_STREET_LEN]
             student.address.home.house = int(kwargs.get("house", "0"))
@@ -185,6 +185,7 @@ class RecordList(npyscreen.MultiLineAction):
             "^D": self.when_delete_record,
             "^S": self.save_database,
             "^R": self.sort,
+            "^H": self.only_hostel,
         })
 
     def display_value(self, vl):
@@ -216,6 +217,10 @@ class RecordList(npyscreen.MultiLineAction):
         self.parent.parentApp.myDatabase.sort()
         self.parent.update_list()
 
+    def only_hostel(self, *args, **kwargs):
+        self.parent.parentApp.hostel_only ^= True
+        self.parent.update_list()
+
 
 class RecordListDisplay(npyscreen.FormMutt):
     MAIN_WIDGET_CLASS = RecordList
@@ -223,7 +228,11 @@ class RecordListDisplay(npyscreen.FormMutt):
         self.update_list()
 
     def update_list(self):
-        self.wMain.values = self.parentApp.myDatabase.list_all_records()
+        recs = self.parentApp.myDatabase.list_all_records()
+        if self.parentApp.hostel_only:
+            recs = list(r for r in recs
+                        if housing_t.values.index(r.housing) == housing_t.HOSTEL)
+        self.wMain.values = recs
         self.wMain.display()
 
 
@@ -332,15 +341,16 @@ class EditRecord(npyscreen.ActionForm):
         self.parentApp.switchFormPrevious()
 
 
-class AddressBookApplication(npyscreen.NPSAppManaged):
+class StudentsApplication(npyscreen.NPSAppManaged):
     def onStart(self):
-        self.myDatabase = AddressDatabase()
+        self.hostel_only = False
+        self.myDatabase = StudentsDatabase()
         self.addForm("MAIN", RecordListDisplay)
         self.addForm("EDITRECORDFM", EditRecord)
 
 if __name__ == '__main__':
     try:
-        myApp = AddressBookApplication()
+        myApp = StudentsApplication()
         myApp.run()
     except KeyboardInterrupt:
         pass
