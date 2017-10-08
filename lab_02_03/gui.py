@@ -110,12 +110,13 @@ class AddressDatabase(object):
         student = student_t()
         lib.init_student_t(byref(student))
 
-        student.name = kwargs.get("name", "").encode("utf-8")
+        student.name = kwargs.get("name", "").encode("utf-8")[:STDNT_NAME_LEN]
         student.height = c_uint8(int(kwargs.get("height", 160)))
         lib.clear_str(student.name, STDNT_NAME_LEN)
         student.housing = int(kwargs.get("housing", "0"))
         if (student.housing == housing_t.HOME):
-            student.address.home.street = kwargs.get("street", "").encode("utf-8")
+            student.address.home.street = kwargs.get(
+                "street", "").encode("utf-8")[:STDNT_STREET_LEN]
             student.address.home.house = int(kwargs.get("house", "0"))
             student.address.home.room = int(kwargs.get("room", "0"))
         else:
@@ -257,12 +258,35 @@ class EditRecord(npyscreen.ActionForm):
         self.house = self.add(npyscreen.TitleText, name="House:")
         self.room = self.add(npyscreen.TitleText, name="Room:")
 
+    @staticmethod
+    def int_only(self):
+        def wrapper():
+            def check():
+                if not str(self.value).isnumeric():
+                    return False
+
+                if int(self.value) < 0:
+                    return False
+
+                return True
+
+            if not check():
+                self.color = "DANGER"
+                self.labelColor = "CRITICAL"
+            else:
+                self.color = self.labelColor = "GOOD"
+        return wrapper
+
     def while_editing(self, *args, **keywords):
         self.street.editable = self.housing.value[0] == housing_t.HOME
         self.street.update()
+
         super(self.__class__, self).while_editing(self, *args, **keywords)
 
     def beforeEditing(self):
+        self.house.when_value_edited = self.int_only(self.house)
+        self.room.when_value_edited = self.int_only(self.room)
+
         if self.value is not None:
             record = self.parentApp.myDatabase.get_record(self.value)
             self.name = "Record id : %s" % record.record_id
