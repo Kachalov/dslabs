@@ -5,7 +5,7 @@
 #include <inttypes.h>
 
 #define BITMASK_CHUNK 64
-#define BITMASK_SLOTS 1024
+#define BITMASK_SLOTS 47
 
 void set_bit(uint64_t *data, size_t ndx, bool val);
 bool get_bit(uint64_t *data, size_t ndx);
