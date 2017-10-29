@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -Wall -Werror -pedantic -std=c11
-OBJS := lib/list.o
+OBJS := lib/list.o stack.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage

@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "errors.h"
 
-uint8_t create_list(list_t **list_ptr)
+uint8_t list_init(list_t **list_ptr)
 {
     list_t *list = malloc(sizeof(list_t));
 
@@ -21,7 +21,7 @@ uint8_t create_list(list_t **list_ptr)
     return EOK;
 }
 
-uint8_t delete_list(list_t **list_ptr)
+uint8_t list_delete(list_t **list_ptr)
 {
     list_t *next = NULL;
 
@@ -35,18 +35,18 @@ uint8_t delete_list(list_t **list_ptr)
     return EOK;
 }
 
-uint8_t add_element(list_t **list_ptr)
+uint8_t list_add(list_t **list_ptr)
 {
     list_t *element = NULL;
     uint8_t err = EOK;
 
     if (*list_ptr == NULL)
     {
-        err = create_list(list_ptr);
+        err = list_init(list_ptr);
         return err;
     }
 
-    err = create_list(&element);
+    err = list_init(&element);
     if (err)
         return err;
 

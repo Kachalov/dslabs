@@ -8,6 +8,6 @@ typedef struct list_st
     struct list_st *next;
 } list_t;
 
-uint8_t create_list(list_t **list_ptr);
-uint8_t delete_list(list_t **list_ptr);
-uint8_t add_element(list_t **list_ptr);
+uint8_t list_init(list_t **list_ptr);
+uint8_t list_delete(list_t **list_ptr);
+uint8_t list_add(list_t **list_ptr);
