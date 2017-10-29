@@ -33,3 +33,4 @@ void *stack_pop_ad(stack_t *s);
 void *stack_pop_l(stack_t *s);
 
 int stack_init(stack_t **s, bool up, bool list, void *lp, void *hp, size_t size);
+void stack_delete(stack_t **s);
