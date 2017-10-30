@@ -50,11 +50,10 @@ int stack_push_ad(stack_t *s, void *v)
 int stack_push_l(stack_t *s, void *v)
 {
     if (((list2_t *)(s->sp))->next == NULL)
-    {
         list2_add((list2_t **)(&s->sp));
-    }
+    else
+        s->sp = ((list2_t *)(s->sp))->next;
 
-    s->sp = ((list2_t *)(s->sp));
     memcpy(s->sp, v, s->data_size);
 
     return EOK;
