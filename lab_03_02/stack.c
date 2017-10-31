@@ -6,7 +6,7 @@
 #include "lib/errors.h"
 #include "lib/list2.h"
 
-int stack_push(stack_t *s, void *v)
+int stack_push(lab_stack_t *s, void *v)
 {
     if (s->list)
     {
@@ -21,7 +21,7 @@ int stack_push(stack_t *s, void *v)
     }
 }
 
-int stack_push_au(stack_t *s, void *v)
+int stack_push_au(lab_stack_t *s, void *v)
 {
     s->sp = (char *)s->sp + s->data_size;
     if (s->sp > s->hp)
@@ -34,7 +34,7 @@ int stack_push_au(stack_t *s, void *v)
     return EOK;
 }
 
-int stack_push_ad(stack_t *s, void *v)
+int stack_push_ad(lab_stack_t *s, void *v)
 {
     s->sp = (char *)s->sp - s->data_size;
     if (s->sp < s->lp)
@@ -47,7 +47,7 @@ int stack_push_ad(stack_t *s, void *v)
     return EOK;
 }
 
-int stack_push_l(stack_t *s, void *v)
+int stack_push_l(lab_stack_t *s, void *v)
 {
     if (((list2_t *)(s->sp))->next == NULL)
         list2_add((list2_t **)(&s->sp));
@@ -60,7 +60,7 @@ int stack_push_l(stack_t *s, void *v)
 }
 
 
-void *stack_pop(stack_t *s)
+void *stack_pop(lab_stack_t *s)
 {
     if (s->list)
     {
@@ -75,7 +75,7 @@ void *stack_pop(stack_t *s)
     }
 }
 
-void *stack_pop_au(stack_t *s)
+void *stack_pop_au(lab_stack_t *s)
 {
     if (s->sp < s->lp)
         return NULL;
@@ -84,7 +84,7 @@ void *stack_pop_au(stack_t *s)
     return (char *)s->sp + s->data_size;
 }
 
-void *stack_pop_ad(stack_t *s)
+void *stack_pop_ad(lab_stack_t *s)
 {
     if (s->sp >= s->hp)
         return NULL;
@@ -93,7 +93,7 @@ void *stack_pop_ad(stack_t *s)
     return (char *)s->sp - s->data_size;
 }
 
-void *stack_pop_l(stack_t *s)
+void *stack_pop_l(lab_stack_t *s)
 {
     if (s->sp == s->lp)
         return NULL;
@@ -103,9 +103,9 @@ void *stack_pop_l(stack_t *s)
 }
 
 
-int stack_init(stack_t **s, bool up, bool list, void *lp, void *hp, size_t size)
+int stack_init(lab_stack_t **s, bool up, bool list, void *lp, void *hp, size_t size)
 {
-    *s = (stack_t *)malloc(sizeof(stack_t));
+    *s = (lab_stack_t *)malloc(sizeof(lab_stack_t));
     (*s)->data_size = size;
     (*s)->lp = lp;
     (*s)->hp = hp;
@@ -129,7 +129,7 @@ int stack_init(stack_t **s, bool up, bool list, void *lp, void *hp, size_t size)
     return EOK;
 }
 
-void stack_delete(stack_t **s)
+void stack_delete(lab_stack_t **s)
 {
     if (*s == NULL)
         return;

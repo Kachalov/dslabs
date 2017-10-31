@@ -20,17 +20,17 @@ typedef struct
         };
         uint8_t flags;
     };
-} stack_t;
+} lab_stack_t;
 
-int stack_push(stack_t *s, void *v);
-int stack_push_au(stack_t *s, void *v);
-int stack_push_ad(stack_t *s, void *v);
-int stack_push_l(stack_t *s, void *v);
+int stack_push(lab_stack_t *s, void *v);
+int stack_push_au(lab_stack_t *s, void *v);
+int stack_push_ad(lab_stack_t *s, void *v);
+int stack_push_l(lab_stack_t *s, void *v);
 
-void *stack_pop(stack_t *s);
-void *stack_pop_au(stack_t *s);
-void *stack_pop_ad(stack_t *s);
-void *stack_pop_l(stack_t *s);
+void *stack_pop(lab_stack_t *s);
+void *stack_pop_au(lab_stack_t *s);
+void *stack_pop_ad(lab_stack_t *s);
+void *stack_pop_l(lab_stack_t *s);
 
-int stack_init(stack_t **s, bool up, bool list, void *lp, void *hp, size_t size);
-void stack_delete(stack_t **s);
+int stack_init(lab_stack_t **s, bool up, bool list, void *lp, void *hp, size_t size);
+void stack_delete(lab_stack_t **s);

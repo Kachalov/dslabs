@@ -185,7 +185,7 @@ class RecordList(npyscreen.MultiLineAction):
             "^D": self.when_delete_record,
             "^S": self.save_database,
             "^R": self.sort,
-            "^H": self.only_hostel,
+            "^B": self.only_hostel,
         })
 
     def display_value(self, vl):
@@ -277,6 +277,9 @@ class EditRecord(npyscreen.ActionForm):
                 if int(self.value) < 0:
                     return False
 
+                if int(self.value) > 255:
+                    return False
+
                 return True
 
             if not check():
@@ -289,6 +292,8 @@ class EditRecord(npyscreen.ActionForm):
     def while_editing(self, *args, **keywords):
         self.street.editable = self.housing.value[0] == housing_t.HOME
         self.street.update()
+
+        self.ok_button.hidden = "DANGER" in [self.house.color, self.room.color]
 
         super(self.__class__, self).while_editing(self, *args, **keywords)
 
@@ -308,6 +313,7 @@ class EditRecord(npyscreen.ActionForm):
             self.house.value = str(record.house)
             self.room.value = str(record.room)
         else:
+            self.record_id = None
             self.name = "New Record"
             self.height.value = 0
             self.gender.value = gender_t.MALE
@@ -348,8 +354,42 @@ class StudentsApplication(npyscreen.NPSAppManaged):
         self.addForm("MAIN", RecordListDisplay)
         self.addForm("EDITRECORDFM", EditRecord)
 
+        """
+        i = 0
+        import random
+        with open("list_out.txt", "r") as f:
+            for s in f:
+                gender, name = s.split(maxsplit=1)
+                name = name.strip()
+                street = "Street"
+                i += 1
+                if i > 3000:
+                    break
+                myApp.myDatabase.add_record(
+                    name=name[:20],
+                    height=random.randint(160, 200),
+                    gender=gender,
+                    housing=random.randint(0, 1),
+                    street=street[:30],
+                    house=random.randint(1, 11),
+                    room=random.randint(1, 91),
+                )
+                myApp.myDatabase.save()
+        """
+
+
 if __name__ == '__main__':
     try:
+        print("""
+Add new record (ctrl + A)
+Delete record (ctrl + D)
+Change record (Enter)
+Sort list (ctrl + R)
+Save database (ctrl + S)
+Show only hostel students (ctrl + B)
+        """)
+        input("Press Enter to continue...")
+
         myApp = StudentsApplication()
         myApp.run()
     except KeyboardInterrupt:

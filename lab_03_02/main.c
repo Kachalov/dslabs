@@ -12,9 +12,9 @@
 
 int main(void)
 {
-    stack_t *su = NULL;
-    stack_t *sd = NULL;
-    stack_t *sl = NULL;
+    lab_stack_t *su = NULL;
+    lab_stack_t *sd = NULL;
+    lab_stack_t *sl = NULL;
     int16_t a[STACK_ARRAY_SIZE];
     int16_t x = 0;
     int16_t *tmp_ptr = NULL;
