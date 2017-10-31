@@ -50,11 +50,16 @@ int stack_push_ad(lab_stack_t *s, void *v)
 int stack_push_l(lab_stack_t *s, void *v)
 {
     if (((list2_t *)(s->sp))->next == NULL)
+    {
         list2_add((list2_t **)(&s->sp));
+        ((list2_t *)(s->sp))->data = malloc(s->data_size);
+        if (((list2_t *)(s->sp)) == NULL)
+            return EOOM;
+    }
     else
         s->sp = ((list2_t *)(s->sp))->next;
 
-    memcpy(s->sp, v, s->data_size);
+    memcpy(((list2_t *)(s->sp))->data, v, s->data_size);
 
     return EOK;
 }
@@ -99,7 +104,7 @@ void *stack_pop_l(lab_stack_t *s)
         return NULL;
 
     s->sp = ((list2_t *)(s->sp))->prev;
-    return ((list2_t *)(s->sp))->next;
+    return ((list2_t *)(s->sp))->next->data;
 }
 
 
@@ -135,7 +140,9 @@ void stack_delete(lab_stack_t **s)
         return;
 
     if (((*s)->list))
+    {
         list2_delete((list2_t **)(&(*s)->lp));
+    }
 
     free(*s);
     *s = NULL;

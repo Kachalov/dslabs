@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define STACK_POP(tmp, type, def, stack) \
+    (tmp = stack_pop(stack)) == NULL ? def : *(type *)tmp
+
 typedef struct
 {
     void *lp; /// Lower border
