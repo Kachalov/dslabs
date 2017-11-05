@@ -7,8 +7,13 @@
 #include "lib/errors.h"
 #include "lib/list2.h"
 
-#define STACK_ARRAY_SIZE 6
-#define STACK_UP_NDX 2
+#ifndef STACK_ARRAY_SIZE
+    #define STACK_ARRAY_SIZE 6
+#endif
+
+#ifndef STACK_UP_NDX
+    #define STACK_UP_NDX 2
+#endif
 
 int main(void)
 {
@@ -18,6 +23,8 @@ int main(void)
     int16_t a[STACK_ARRAY_SIZE];
     int16_t x = 0;
     int16_t *tmp_ptr = NULL;
+    char buf[80];
+    char *arg;
 
     stack_init(&su, true, false,
                a, a + STACK_UP_NDX, sizeof(int16_t));
@@ -28,9 +35,7 @@ int main(void)
 
     srand((unsigned) time(NULL));
 
-    printf("Type 'h' for help\n");
-    char buf[80];
-    char *arg;
+    printf("COM> ");
     while (fgets(buf, 80, stdin) != NULL)
     {
         if (strlen(buf) >= 1 && buf[strlen(buf) - 1] == '\n')
@@ -41,7 +46,7 @@ int main(void)
         if (arg == NULL)
             arg = buf;
 
-        if (strcmp(arg, "") == 0)
+        if (strcmp(arg, "i") == 0)
         {
             x = rand() % (INT16_MAX - INT16_MIN);
 
@@ -104,7 +109,7 @@ int main(void)
         {
             printf(
                 "h           - for help\n"
-                "[enter]     - iterate\n"
+                "i           - iterate\n"
                 "s {N} {V}   - set value {V} to stack {N}\n"
                 "              (1 - stack up, 2 - stack down, 3 - stack list)\n"
                 "g {N}       - get value from stack {N}\n"
@@ -116,6 +121,7 @@ int main(void)
             printf("Type 'h' for help\n");
         }
 
+        printf("\n=== Stack on array ===\n");
         printf("  ");
         for (int i = 0; i < STACK_ARRAY_SIZE; i++)
         {
@@ -142,13 +148,22 @@ int main(void)
         }
         printf("\n");
 
+        printf("\n=== Stack on list ===\n");
         for (list2_t *it = sl->lp; it != NULL; it = it->next)
         {
             if (it->data != NULL)
+            {
+                if (sl->sp == it)
+                    printf("> ");
+                else
+                    printf("  ");
+
                 printf("%p %d\n", (void *)it, *(int16_t *)it->data);
+            }
         }
-            //printf("%d ", *(int16_t *)it->data);
         printf("\n");
+
+        printf("COM> ");
     }
 
     stack_delete(&su);
