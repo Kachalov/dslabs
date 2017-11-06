@@ -1,23 +1,44 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
 #include "stack.h"
 #include "lib/errors.h"
 #include "lib/list2.h"
+#include "lib/time.h"
 
 int stack_push(lab_stack_t *s, void *v)
 {
+    tick_t a, b;
+    int err;
+
     if (s->list)
     {
-        return stack_push_l(s, v);
+        a = tick();
+        err = stack_push_l(s, v);
+        b = tick();
+        fprintf(stderr, "PUSH LIST: %lu ticks\n", b - a);
+        return err;
     }
     else
     {
         if (s->up)
-            return stack_push_au(s, v);
+        {
+            a = tick();
+            err = stack_push_au(s, v);
+            b = tick();
+            fprintf(stderr, "PUSH ARR UP: %lu ticks\n", b - a);
+            return err;
+        }
         else
-            return stack_push_ad(s, v);
+        {
+            a = tick();
+            err = stack_push_ad(s, v);
+            b = tick();
+            fprintf(stderr, "PUSH ARR DOWN: %lu ticks\n", b - a);
+            return err;
+        }
     }
 }
 
@@ -67,16 +88,35 @@ int stack_push_l(lab_stack_t *s, void *v)
 
 void *stack_pop(lab_stack_t *s)
 {
+    tick_t a, b;
+    void *val;
+
     if (s->list)
     {
-        return stack_pop_l(s);
+        a = tick();
+        val = stack_pop_l(s);
+        b = tick();
+        fprintf(stderr, "POP LIST: %lu ticks\n", b - a);
+        return val;
     }
     else
     {
         if (s->up)
-            return stack_pop_au(s);
+        {
+            a = tick();
+            val = stack_pop_au(s);
+            b = tick();
+            fprintf(stderr, "POP ARR UP: %lu ticks\n", b - a);
+            return val;
+        }
         else
-            return stack_pop_ad(s);
+        {
+            a = tick();
+            val = stack_pop_ad(s);
+            b = tick();
+            fprintf(stderr, "POP ARR DOWN: %lu ticks\n", b - a);
+            return val;
+        }
     }
 }
 
