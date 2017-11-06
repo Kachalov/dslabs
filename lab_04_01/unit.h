@@ -16,6 +16,10 @@
     #define QUEUE_SIZE 20
 #endif
 
+#ifndef UNITS
+    #define UNITS 1000
+#endif
+
 typedef struct
 {
     float t;
@@ -23,3 +27,4 @@ typedef struct
 } unit_t;
 
 void operate(FILE *fout);
+float random_time(float a, float b);

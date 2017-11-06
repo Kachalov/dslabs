@@ -14,3 +14,5 @@ typedef struct
 
 int queue_init(queue_t **q, size_t len, size_t size);
 int queue_delete(queue_t **q);
+int queue_push(queue_t *q);
+int queue_pop(queue_t *q);
