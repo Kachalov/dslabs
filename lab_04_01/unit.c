@@ -4,8 +4,8 @@
 
 void operate(FILE *fout)
 {
-    queue_arr_t *q_pre;
-    queue_lst_t *q_main;
+    queue_arr_p_t q_pre;
+    queue_lst_p_t q_main;
 
     queue_arr_init(&q_pre, 4, sizeof(unit_t));
     queue_lst_init(&q_main, sizeof(unit_t));
