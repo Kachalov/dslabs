@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #define T1B 0f

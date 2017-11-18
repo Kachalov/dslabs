@@ -1,13 +1,14 @@
 #include "unit.h"
-#include "queue.h"
+#include "queue_arr.h"
+#include "queue_lst.h"
 
 void operate(FILE *fout)
 {
-    queue_t q1;
-    queue_t q2;
+    queue_arr_t *q_pre;
+    queue_lst_t *q_main;
 
-    queue_init(q1, 4, sizeof(unit_t));
-    queue_init(q1, QUEUE_SIZE - 4, sizeof(unit_t));
+    queue_arr_init(&q_pre, 4, sizeof(unit_t));
+    queue_lst_init(&q_main, sizeof(unit_t));
 
     float time = 0;
     float time_t1 = 0;
