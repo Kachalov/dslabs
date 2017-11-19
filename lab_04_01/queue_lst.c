@@ -60,6 +60,12 @@ int queue_lst_push(queue_lst_t *q, void *data)
     return err;
 }
 
+int queue_lst_insert(queue_lst_t *q, size_t pos, void *data)
+{
+    // TODO
+    return queue_lst_push(q, data);
+}
+
 int queue_lst_pop(queue_lst_t *q, void *ret)
 {
     list2_t *lst = NULL;

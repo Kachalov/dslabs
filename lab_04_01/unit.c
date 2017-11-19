@@ -32,7 +32,7 @@ void operate(FILE *fout)
         time += unit.t;
 
         if (unit.type == T2)
-            queue_lst_push(q, &unit);
+            queue_lst_insert(q, q->n >= MAX_POS ? MAX_POS : q->n, &unit);
 
         if (time_t1 <= time)
         {

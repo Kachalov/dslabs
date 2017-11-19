@@ -26,5 +26,8 @@ test.exe: $(OBJS) test.o
 main.so: $(OBJS)
 	$(CC) $(CFLAGS) -shared $^ -o $@
 
+memcheck: main.exe
+	valgrind --leak-check=yes ./main.exe 1>/dev/null
+
 clean:
 	rm -f *.exe *.gcda *.gcno *.o *.so
