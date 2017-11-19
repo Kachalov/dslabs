@@ -50,18 +50,16 @@ int queue_arr_push(queue_arr_t *q, void *data)
     return err;
 }
 
-void *queue_arr_pop(queue_arr_t *q)
+void queue_arr_pop(queue_arr_t *q, void **ret)
 {
-    void *ret = NULL;
+    *ret = NULL;
     if (q->n > 0)
     {
-        ret = q->pout;
+        memcpy(*ret, q->pout, q->size);
         if ((char *)q->pout - (char *)q->data + q->size == q->size * q->len)
             q->pout = q->data;
         else
             q->pout = (char *)q->pout + q->size;
         q->n--;
     }
-
-    return ret;
 }

@@ -56,19 +56,18 @@ int queue_lst_push(queue_lst_t *q, void *data)
     return err;
 }
 
-void *queue_lst_pop(queue_lst_t *q)
+void queue_lst_pop(queue_lst_t *q, void **ret)
 {
-    void *ret = NULL;
+    *ret = NULL;
     list2_t *lst = NULL;
 
     if (q->n != 0)
     {
-        ret = ((list2_t *)(q->pout))->data;
+        memcpy(*ret, ((list2_t *)(q->pout))->data, q->size);
+        free(((list2_t *)(q->pout))->data);
         lst = ((list2_t *)(q->pout))->next;
         list2_delete_el((list2_t **)&q->pout);
         q->pout = lst;
         q->n--;
     }
-
-    return ret;
 }
