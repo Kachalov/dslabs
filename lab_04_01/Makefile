@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -Wall -Werror -pedantic -std=gnu11
-OBJS := queue_arr.o queue_lst.o unit.o
+OBJS := queue_arr.o queue_lst.o list1.o unit.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage
