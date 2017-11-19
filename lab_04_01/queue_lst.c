@@ -25,7 +25,7 @@ int queue_lst_init(queue_lst_p_t *q, size_t size)
 
 void queue_lst_delete(queue_lst_p_t *q)
 {
-    list1_delete_all((*q)->pin);
+    list1_delete_all((list1_t **)&(*q)->pin);
     free(*q);
     *q = NULL;
 }

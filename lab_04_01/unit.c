@@ -10,7 +10,7 @@ void operate(FILE *fout)
     queue_arr_init(&q_pre, 4, sizeof(unit_t));
     queue_lst_init(&q_main, sizeof(unit_t));
 
-    float time = 0;
+    /*float time = 0;
     float time_t1 = 0;
 
     float total_time = 0;
@@ -21,13 +21,17 @@ void operate(FILE *fout)
     int units_out = 0;
     int units = 0;
 
-    float rnd = 0;
+    float rnd = 0;*/
 
     do
     {
         // TODO
+        break;
     }
     while (1);
+
+    queue_arr_delete(&q_pre);
+    queue_lst_delete(&q_main);
 }
 
 float random_time(float a, float b)
