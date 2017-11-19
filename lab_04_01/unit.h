@@ -7,18 +7,20 @@
 #define T1 1
 #define T2 2
 
-#define T1B 0f
-#define T1E 5f
+#define T1B 0.f
+#define T1E 5.f
 
-#define T2B 0f
-#define T2E 4f
+#define T2B 0.f
+#define T2E 4.f
 
-#define T3B 0f
-#define T3E 4f
+#define T3B 0.f
+#define T3E 4.f
 
 #ifndef QUEUE_SIZE
     #define QUEUE_SIZE 20
 #endif
+
+#define MAX_POS 4
 
 #ifndef UNITS
     #define UNITS 1000

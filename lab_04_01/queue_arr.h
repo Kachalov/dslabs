@@ -18,4 +18,4 @@ typedef queue_arr_t *queue_arr_p_t;
 int queue_arr_init(queue_arr_p_t *q, size_t len, size_t size);
 void queue_arr_delete(queue_arr_p_t *q);
 int queue_arr_push(queue_arr_t *q, void *data);
-void queue_arr_pop(queue_arr_t *q, void **ret);
+int queue_arr_pop(queue_arr_t *q, void *ret);

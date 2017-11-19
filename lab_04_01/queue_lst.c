@@ -26,7 +26,8 @@ int queue_lst_init(queue_lst_p_t *q, size_t size)
 
 void queue_lst_delete(queue_lst_p_t *q)
 {
-    list2_delete((list2_t **)&(*q)->pin);
+    while(queue_lst_pop(*q, NULL) != ENULL);
+    //list2_delete((list2_t **)&(*q)->pin);
     free(*q);
     *q = NULL;
 }
@@ -34,6 +35,7 @@ void queue_lst_delete(queue_lst_p_t *q)
 int queue_lst_push(queue_lst_t *q, void *data)
 {
     int err = EOK;
+    list2_t *lst = NULL;
 
     err = list2_add((list2_t **)&q->pin);
     if (err == EOK)
@@ -42,7 +44,9 @@ int queue_lst_push(queue_lst_t *q, void *data)
         if (((list2_t *)q->pin)->data == NULL)
         {
             err = EOOM;
+            lst = ((list2_t *)(q->pin))->next;
             list2_delete_el((list2_t **)&q->pin);
+            q->pin = lst;
         }
         else
         {
@@ -56,18 +60,28 @@ int queue_lst_push(queue_lst_t *q, void *data)
     return err;
 }
 
-void queue_lst_pop(queue_lst_t *q, void **ret)
+int queue_lst_pop(queue_lst_t *q, void *ret)
 {
-    *ret = NULL;
     list2_t *lst = NULL;
 
     if (q->n != 0)
     {
-        memcpy(*ret, ((list2_t *)(q->pout))->data, q->size);
+        if (ret != NULL)
+        {
+            memcpy(ret, ((list2_t *)(q->pout))->data, q->size);
+        }
+
+        if (((list2_t *)(q->pout)) == q->pin)
+            q->pin = NULL;
+
         free(((list2_t *)(q->pout))->data);
         lst = ((list2_t *)(q->pout))->next;
         list2_delete_el((list2_t **)&q->pout);
         q->pout = lst;
         q->n--;
+
+        return EOK;
     }
+
+    return ENULL;
 }
