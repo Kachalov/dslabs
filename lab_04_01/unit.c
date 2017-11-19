@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "unit.h"
 #include "queue_arr.h"
 #include "queue_lst.h"

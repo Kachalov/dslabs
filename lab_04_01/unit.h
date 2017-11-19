@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define T1 1
+#define T2 2
+
 #define T1B 0f
 #define T1E 5f
 
