@@ -9,12 +9,12 @@ int queue_arr_init(queue_arr_p_t *q, size_t len, size_t size)
 {
 	int err = EOK;
 
-    *q = malloc(sizeof(typeof(**q)) + len * size);
+    *q = malloc(sizeof(__typeof__(**q)) + len * size);
     if (*q == NULL)
         err = EOOM;
     else
     {
-        (*q)->data = (typeof(**q) *)*q + 1;
+        (*q)->data = (__typeof__(**q) *)*q + 1;
         (*q)->pin = (*q)->data;
         (*q)->pout = (*q)->data;
         (*q)->len = len;

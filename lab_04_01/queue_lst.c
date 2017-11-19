@@ -10,7 +10,7 @@ int queue_lst_init(queue_lst_p_t *q, size_t size)
 {
     int err = EOK;
 
-    *q = malloc(sizeof(typeof(**q)));
+    *q = malloc(sizeof(__typeof__(**q)));
     if (*q == NULL)
         err = EOOM;
     else
