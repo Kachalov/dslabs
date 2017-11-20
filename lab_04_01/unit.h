@@ -23,7 +23,7 @@
 #define MAX_POS 4
 
 #ifndef UNITS
-    #define UNITS 1000
+    #define UNITS 100
 #endif
 
 typedef struct

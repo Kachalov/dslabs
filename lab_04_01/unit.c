@@ -21,20 +21,33 @@ void operate(FILE *fout)
     float idle_time = 0;
     float avg_time = 0;
     float avg_len = 0;
-    int units_in = 0;
-    int units_out = 0;*/
+    int units_in = 0;*/
+    int units_out = 0;
     int units = 0;
 
-    for (; units < UNITS; )
+    for (; units_out <= UNITS; )
     {
+        printf("[%zu] ", q->n);
+        for (list2_t *i = q->pout; i != NULL; i = i->next)
+        {
+            printf("[%d %.2f](%p)",
+                ((unit_t *)i->data)->type,
+                ((unit_t *)i->data)->t,
+                (void *)i);
+            if (i->next) printf(" -> ");
+        }
+        printf("\n");
+
         queue_lst_pop(q, &unit);
 
         time += unit.t;
 
         if (unit.type == T2)
-            queue_lst_insert(q, q->n >= MAX_POS ? MAX_POS : q->n, &unit);
+            queue_lst_insert(q, MAX_POS - 1, &unit);
+        else
+            units_out++;
 
-        if (time_t1 <= time)
+        if (time_t1 <= time && units <= UNITS)
         {
             units++;
             time_t1 += random_time(T1B, T1E);
@@ -43,18 +56,8 @@ void operate(FILE *fout)
             queue_lst_push(q, &unit);
         }
 
-        /*printf("[%zu] ", q->n);
-        for (list2_t *i = q->pout; i != NULL; i = i->next)
-        {
-            printf("%p", (void *)i);
-            if (i->next) printf(" -> ");
-        }
-        printf("\n");*/
-
         if (units % 100 == 0)
-        {
             printf("units: %d time: %.2f\n", units, time);
-        }
     }
 
     queue_lst_delete(&q);

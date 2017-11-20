@@ -50,7 +50,7 @@ int queue_arr_push(queue_arr_t *q, void *data)
     return err;
 }
 
-int queue_arr_insert(queue_arr_t *q, size_t pos, void *data)
+int queue_arr_insert(queue_arr_t *q, size_t ndx, void *data)
 {
     // TODO
     return queue_arr_push(q, data);

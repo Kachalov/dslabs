@@ -27,7 +27,6 @@ int queue_lst_init(queue_lst_p_t *q, size_t size)
 void queue_lst_delete(queue_lst_p_t *q)
 {
     while(queue_lst_pop(*q, NULL) != ENULL);
-    //list2_delete((list2_t **)&(*q)->pin);
     free(*q);
     *q = NULL;
 }
@@ -60,10 +59,30 @@ int queue_lst_push(queue_lst_t *q, void *data)
     return err;
 }
 
-int queue_lst_insert(queue_lst_t *q, size_t pos, void *data)
+int queue_lst_insert(queue_lst_t *q, size_t ndx, void *data)
 {
-    // TODO
-    return queue_lst_push(q, data);
+    int err = EOK;
+    list2_t *lst = q->pin;
+
+    if (ndx + 1 >= q->n)
+        return queue_lst_push(q, data);
+
+    if ((err = list2_insert(ndx, &lst)) == EOK)
+    {
+        lst->data = malloc(q->size);
+        if (lst->data == NULL)
+        {
+            err = EOOM;
+            list2_delete_el(&lst);
+        }
+        else
+        {
+            memcpy(lst->data, data, q->size);
+            q->n++;
+        }
+    }
+
+    return err;
 }
 
 int queue_lst_pop(queue_lst_t *q, void *ret)

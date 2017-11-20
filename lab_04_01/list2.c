@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "list2.h"
 #include "errors.h"
@@ -67,6 +68,33 @@ uint8_t list2_add(list2_t **list_ptr)
     element->prev = *list_ptr;
     (*list_ptr)->next = element;
     *list_ptr = element;
+    return err;
+}
+
+uint8_t list2_insert(size_t ndx, list2_t **list_ptr)
+{
+    uint8_t err = EOK;
+    list2_t *list = *list_ptr;
+    list2_t *next = NULL;
+
+    for (size_t i = 0; i <= ndx && list->next != NULL; i++)
+    {
+        list = list->next;
+    }
+    next = list;
+    list = next->prev;
+
+    if ((err = list2_add(&list)) != EOK)
+        return err;
+
+    if (next != NULL)
+    {
+        next->prev = list;
+        list->next = next;
+    }
+
+    *list_ptr = list;
+
     return err;
 }
 
