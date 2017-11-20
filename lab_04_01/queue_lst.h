@@ -5,10 +5,8 @@
 
 typedef struct
 {
-    void *data;
     void *pin;
     void *pout;
-    size_t len;
     size_t size;
     size_t n;
 } queue_lst_t;
