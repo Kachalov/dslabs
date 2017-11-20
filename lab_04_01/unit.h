@@ -28,7 +28,8 @@
 
 typedef struct
 {
-    float t;
+    float time;
+    float time_added;
     uint8_t type;
 } unit_t;
 
