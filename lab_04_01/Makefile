@@ -10,6 +10,10 @@ ifeq ($(mode), release)
 	CFLAGS += -g0 -O3 -DNDEBUG
 endif
 
+ifeq ($(type), list)
+	CFLAGS += -DQUEUE_LIST
+endif
+
 ifeq ($(MAKECMDGOALS), main.so)
 	CFLAGS += -fpic
 endif

@@ -8,15 +8,15 @@
 
 void operate(FILE *fout)
 {
-    queue_lst_p_t q;
-    queue_lst_init(&q, sizeof(unit_t));
+    QUEUE_P_TYPE q;
+    QUEUE_INIT(q);
 
     unit_t unit = {
         .time = random_time(T3B, T3E),
         .time_added = 0,
         .type = T2
     };
-    queue_lst_push(q, &unit);
+    QUEUE_PUSH(q, unit);
 
     float time = 0;
     float time_t1 = random_time(T1B, T1E);
@@ -31,6 +31,11 @@ void operate(FILE *fout)
     int print_last = 0;
 
 
+    #ifdef QUEUE_LIST
+        printf("Queue on list\n");
+    #else
+        printf("Queue on array\n");
+    #endif
     printf("units:\t\tavg queue len:\t\tavg time:\n");
     while (units_t1_out < UNITS)
     {
@@ -49,7 +54,7 @@ void operate(FILE *fout)
 
         units_sum += q->n;
 
-        queue_lst_pop(q, &unit);
+        QUEUE_POP(q, unit);
 
         time_sum += time - unit.time_added;
         time += unit.time;
@@ -57,7 +62,7 @@ void operate(FILE *fout)
         if (unit.type == T2)
         {
             units_in++;
-            queue_lst_insert(q, MAX_POS - 1, &unit);
+            QUEUE_INSERT(q, unit);
         }
         else
             units_t1_out++;
@@ -71,7 +76,7 @@ void operate(FILE *fout)
             unit.time_added = time - unit.time;
             unit.time = random_time(T2B, T2E);
             unit.type = T1;
-            queue_lst_push(q, &unit);
+            QUEUE_PUSH(q, unit);
         }
 
         if (units_t1_in % 100 == 0 && units_t1_in != print_last)
@@ -87,7 +92,7 @@ void operate(FILE *fout)
     printf("Total time: %.2f Expected: %.2f-%0.2f\n",
            time_t1, UNITS * ((T1E - T1B)/2) * (97./100), UNITS * ((T1E - T1B)/2) * (103./100));
 
-    queue_lst_delete(&q);
+    QUEUE_DELETE(q);
 }
 
 float random_time(float a, float b)
