@@ -3,6 +3,7 @@
 
 #include "sparse_mtrx.h"
 #include "lib/mtrx.h"
+#include "lib/debug.h"
 #include "lib/errors.h"
 
 void smtrx_init(size_t m, size_t n, smtrx_pt mtrx_p)
@@ -53,8 +54,19 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
     return 0;
 }
 
-int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c_p)
+int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
 {
+    // Only vector
+    if (b->n != 1)
+        return EMTRXSIZE;
+
+    if (a->n != b->m)
+        return EMTRXSIZE;
+
+    smtrx_init(a->n, a->n, c);
+
+    // TODO
+
     return EOK;
 }
 
@@ -95,7 +107,7 @@ int mtrx_smtrx(mtrxp_t f, smtrx_pt t)
  */
 int _smtrx_add(smtrx_pt m, int i, int j, int data)
 {
-    printf("add(i=%d, j=%d, data=%d)\n", i, j, data);
+    DPRINT("add(i=%d, j=%d, data=%d)", i, j, data);
     list1_t *tmp;
 
     tmp = m->a;
