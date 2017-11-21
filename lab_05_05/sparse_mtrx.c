@@ -35,7 +35,8 @@ int smtrx_el(smtrx_pt m, int i, int j)
 mtrx_data_i_t apply_mtrx_smtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
 {
     smtrx_pt smtrx_p = (smtrx_pt)arg;
-    _smtrx_add(smtrx_p, i, j, mtrx_p->d[i][j]);
+    if (mtrx_p->d[i][j])
+        _smtrx_add(smtrx_p, i, j, mtrx_p->d[i][j]);
     return mtrx_p->d[i][j];
 }
 
@@ -57,35 +58,41 @@ int mtrx_smtrx(mtrxp_t f, smtrx_pt t)
  */
 int _smtrx_add(smtrx_pt m, int i, int j, int data)
 {
+    printf("add(i=%d, j=%d, data=%d)\n", i, j, data);
     list1_t *tmp;
-    int x = 0;
 
     tmp = m->a;
     list1_add_tail(&tmp);
     tmp->data = data;
+    if (m->a == NULL)
+        m->a = tmp;
 
     tmp = m->j;
     list1_add_tail(&tmp);
     tmp->data = j;
+    if (m->j == NULL)
+        m->j = tmp;
 
     tmp = m->r;
     if (tmp == NULL)
     {
         list1_add_tail(&tmp);
-        tmp->data = list1_len(m->j) - 1;
+        tmp->data = 0;
+        m->r = tmp;
 
         list1_add_tail(&tmp);
-        tmp->data = list1_len(m->j);
+        tmp->data = 1;
     }
 
-    x = (list1_get(m->j, list1_len(m->j) - 1))->data;
+    tmp = list1_get(m->r, list1_len(m->r) - 1);
+    tmp->data = list1_len(m->j) - 1;
     for (int a = i + 2 - list1_len(m->r); a > 0; a--)
     {
         list1_add_tail(&tmp);
-        tmp->data = x;
+        tmp->data = list1_len(m->j) - 1;
     }
 
-    tmp->data = i;
+    tmp->data = list1_len(m->j);
 
     return EOK;
 }

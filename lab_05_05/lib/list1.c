@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 
 #include "list1.h"
@@ -74,7 +75,7 @@ uint8_t list1_add_tail(list1_t **list_ptr)
     while (last->next != NULL)
         last = last->next;
 
-    (*list_ptr)->next = element;
+    last->next = element;
     *list_ptr = element;
     return err;
 }
@@ -82,7 +83,7 @@ uint8_t list1_add_tail(list1_t **list_ptr)
 list1_t *list1_get(list1_t *list_ptr, uint64_t ndx)
 {
     list1_t *ret = list_ptr;
-    for (int i = 0; i < ndx && ret != NULL; i++)
+    for (uint64_t i = 0; i < ndx && ret != NULL && ret->next != NULL; i++)
         ret = ret->next;
     return ret;
 }

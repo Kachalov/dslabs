@@ -33,11 +33,30 @@ int main(int argc, char **argv)
         }
     }
 
+    smtrx_t sa;
+    mtrx_smtrx(a, &sa);
+
+    printf("A: ");
+    for (list1_t *l = sa.a; l; l = l->next)
+        printf("%d ", l->data);
+    printf("\n");
+
+    printf("J: ");
+    for (list1_t *l = sa.j; l; l = l->next)
+        printf("%d ", l->data);
+    printf("\n");
+
+    printf("R: ");
+    for (list1_t *l = sa.r; l; l = l->next)
+        printf("%d ", l->data);
+    printf("\n");
+
     free_mtrx(&a);
     free_mtrx(&b);
     free_mtrx(&c);
 
     printf("Err code: %d\n", err);
+
 
     return 0;
 }
