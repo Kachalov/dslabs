@@ -62,7 +62,7 @@ int queue_lst_push(queue_lst_t *q, void *data)
 int queue_lst_insert(queue_lst_t *q, size_t ndx, void *data)
 {
     int err = EOK;
-    list2_t *lst = q->pin;
+    list2_t *lst = q->pout;
 
     if (ndx + 1 >= q->n)
         return queue_lst_push(q, data);

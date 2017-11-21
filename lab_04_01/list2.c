@@ -77,7 +77,7 @@ uint8_t list2_insert(size_t ndx, list2_t **list_ptr)
     list2_t *list = *list_ptr;
     list2_t *next = NULL;
 
-    for (size_t i = 0; i <= ndx && list->next != NULL; i++)
+    for (size_t i = 0; i < ndx && list->next != NULL; i++)
     {
         list = list->next;
     }
