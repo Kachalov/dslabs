@@ -40,16 +40,19 @@ void operate(FILE *fout)
     while (units_t1_out < UNITS)
     {
         #ifdef DEBUG
-            printf("[%zu] ", q->n);
-            for (list2_t *i = q->pout; i != NULL; i = i->next)
-            {
-                printf("[%d %.2f](%p)",
-                    ((unit_t *)i->data)->type,
-                    ((unit_t *)i->data)->t,
-                    (void *)i);
-                if (i->next) printf(" -> ");
-            }
-            printf("\n");
+            #ifdef QUEUE_LIST
+                printf("[%zu] ", q->n);
+                for (list2_t *i = q->pout; i != NULL; i = i->next)
+                {
+                    printf("[%d %.2f:%.2f](%p)",
+                        ((unit_t *)i->data)->type,
+                        ((unit_t *)i->data)->time_added,
+                        ((unit_t *)i->data)->time,
+                        (void *)i);
+                    if (i->next) printf(" -> ");
+                }
+                printf("\n");
+            #endif
         #endif
 
         units_sum += q->n;
@@ -62,6 +65,7 @@ void operate(FILE *fout)
         if (unit.type == T2)
         {
             units_in++;
+            unit.time_added = time - unit.time;
             QUEUE_INSERT(q, unit);
         }
         else
@@ -73,7 +77,7 @@ void operate(FILE *fout)
             units_t1_in++;
             units_in++;
             time_t1 += random_time(T1B, T1E);
-            unit.time_added = time - unit.time;
+            unit.time_added = time_t1;
             unit.time = random_time(T2B, T2E);
             unit.type = T1;
             QUEUE_PUSH(q, unit);

@@ -52,8 +52,21 @@ int queue_arr_push(queue_arr_t *q, void *data)
 
 int queue_arr_insert(queue_arr_t *q, size_t ndx, void *data)
 {
-    // TODO
-    return queue_arr_push(q, data);
+	int err = EOK;
+
+    if (q->n >= q->len)
+        err = EOOM;
+    else
+    {
+        memcpy(q->pin, data, q->size);
+        if ((char *)q->pin - (char *)q->data + q->size == q->size * q->len)
+            q->pin = q->data;
+        else
+            q->pin = (char *)q->pin + q->size;
+        q->n++;
+    }
+
+    return err;
 }
 
 int queue_arr_pop(queue_arr_t *q, void *ret)
