@@ -51,5 +51,5 @@ typedef struct
     uint8_t type;
 } unit_t;
 
-void operate(FILE *fout);
+void operate(FILE *fout, int verbose);
 float random_time(float a, float b);
