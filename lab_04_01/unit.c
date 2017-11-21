@@ -28,6 +28,7 @@ void operate(FILE *fout, int verbose)
     float time_sum = 0;
 
     float time_idle = 0;
+    float time_expected = UNITS * ((T2E - T2B)/2) + (float) UNITS / 4 * ((T3E - T3B)/2);
 
     int units_in = 0;
     int units_out = 0;
@@ -107,7 +108,7 @@ void operate(FILE *fout, int verbose)
     printf("T1: in(%d) out(%d)\n", units_t1_in, units_t1_out);
     printf("T2: %d\n", units_out - units_t1_out);
     printf("Total time: %.2f Expected: %.2f-%0.2f\n",
-           time_t1, UNITS * ((T1E - T1B)/2) * (97./100), UNITS * ((T1E - T1B)/2) * (103./100));
+           time, time_expected * 0.97, time_expected * 1.03);
     printf("Time idle: %.2f\n", time_idle);
 
     QUEUE_DELETE(q);
