@@ -16,6 +16,43 @@ void smtrx_init(size_t m, size_t n, smtrx_pt mtrx_p)
     mtrx_p->r = NULL;
 }
 
+int smtrx_next(smtrx_pt m, int *i, int *j)
+{
+    int tmp = 0;
+    int use_next = 0;
+
+    if (*i < 0 || *j < 0)
+    {
+        *i = 0;
+        *j = -1;
+        use_next = 1;
+    }
+
+    for (int f = *i; f < *i + 2; f++)
+    {
+        int l = list1_get(m->r, f)->data;
+        int r = list1_get(m->r, f + 1)->data;
+
+        for (int k = l; k < r; k++)
+        {
+            tmp = list1_get(m->j, k)->data;
+            if (use_next)
+            {
+                *i = f;
+                *j = tmp;
+                return list1_get(m->a, k)->data;
+            }
+
+            if (tmp == *j)
+                use_next = 1;
+        }
+    }
+
+    *i = m->m;
+    *j = m->n;
+    return 0;
+}
+
 int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c_p)
 {
     return EOK;
