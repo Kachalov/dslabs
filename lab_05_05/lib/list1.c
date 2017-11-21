@@ -55,10 +55,41 @@ uint8_t list1_add(list1_t **list_ptr)
     return err;
 }
 
+uint8_t list1_add_tail(list1_t **list_ptr)
+{
+    list1_t *element = NULL;
+    list1_t *last = *list_ptr;
+    uint8_t err = EOK;
+
+    if (*list_ptr == NULL)
+    {
+        err = list1_init(list_ptr);
+        return err;
+    }
+
+    err = list1_init(&element);
+    if (err)
+        return err;
+
+    while (last->next != NULL)
+        last = last->next;
+
+    (*list_ptr)->next = element;
+    *list_ptr = element;
+    return err;
+}
+
 list1_t *list1_get(list1_t *list_ptr, uint64_t ndx)
 {
     list1_t *ret = list_ptr;
     for (int i = 0; i < ndx && ret != NULL; i++)
         ret = ret->next;
     return ret;
+}
+
+uint64_t list1_len(list1_t *list_ptr)
+{
+    int i = 0;
+    for (list1_t *l = list_ptr; l != NULL; i++, l = l->next);
+    return i;
 }

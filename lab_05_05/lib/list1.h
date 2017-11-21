@@ -11,4 +11,6 @@ typedef struct list1_st
 uint8_t list1_init(list1_t **list_ptr);
 uint8_t list1_delete(list1_t **list_ptr);
 uint8_t list1_add(list1_t **list_ptr);
+uint8_t list1_add_tail(list1_t **list_ptr);
 list1_t *list1_get(list1_t *list_ptr, uint64_t ndx);
+uint64_t list1_len(list1_t *list_ptr);
