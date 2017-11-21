@@ -14,6 +14,10 @@ ifeq ($(type), list)
 	CFLAGS += -DQUEUE_LIST
 endif
 
+ifeq ($(random), no)
+	CFLAGS += -DNORND
+endif
+
 ifeq ($(MAKECMDGOALS), main.so)
 	CFLAGS += -fpic
 endif
