@@ -14,7 +14,7 @@ uint8_t list1_init(list1_t **list_ptr)
         return EOOM;
     }
 
-    list->data = NULL;
+    list->data = 0;
     list->next = NULL;
     *list_ptr = list;
 
@@ -53,4 +53,12 @@ uint8_t list1_add(list1_t **list_ptr)
     element->next = *list_ptr;
     *list_ptr = element;
     return err;
+}
+
+list1_t *list1_get(list1_t *list_ptr, uint64_t ndx)
+{
+    list1_t *ret = list_ptr;
+    for (int i = 0; i < ndx && ret != NULL; i++)
+        ret = ret->next;
+    return ret;
 }
