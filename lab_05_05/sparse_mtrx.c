@@ -56,29 +56,61 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
 
 int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
 {
+    smtrx_init(0, 0, c);
+
     // Only vector
-    if (b->n != 1)
+    if (a->m != 1)
         return EMTRXSIZE;
 
     if (a->n != b->m)
         return EMTRXSIZE;
 
-    smtrx_init(a->n, a->n, c);
+    smtrx_init(a->m, b->n, c);
 
-    // TODO
+    list1_t *el = NULL;
+
+    int ai = -1;
+    int aj = -1;
+    for (int av = smtrx_next(a, &ai, &aj); ai != a->m; av = smtrx_next(a, &ai, &aj))
+    {
+        for (int bj = 0; bj < b->n; bj++)
+        {
+            int bv = smtrx_el(b, aj, bj);
+            if ((el = smtrx_el_list(c, ai, bj)) == NULL)
+            {
+                _smtrx_add(c, ai, bj, av * bv);
+            }
+            else
+            {
+                el->data += av * bv;
+            }
+        }
+    }
 
     return EOK;
 }
 
 int smtrx_el(smtrx_pt m, int i, int j)
 {
-    int l = list1_get(m->r, i)->data;
-    int r = list1_get(m->r, i + 1)->data;
-
-    for (int k = l; k < r; k++)
-        if ((list1_get(m->j, k)->data) == j)
-            return list1_get(m->a, k)->data;
+    list1_t * list = smtrx_el_list(m, i, j);
+    if (list)
+        return list->data;
     return 0;
+}
+
+list1_t *smtrx_el_list(smtrx_pt m, int i, int j)
+{
+    list1_t *l = list1_get(m->r, i);
+    list1_t *r = list1_get(m->r, i + 1);
+    list1_t *el = NULL;
+
+    if (l == NULL || r == NULL)
+        return NULL;
+
+    for (int k = l->data; k < r->data; k++)
+        if ((el = list1_get(m->j, k)) != NULL && el->data == j)
+            return list1_get(m->a, k);
+    return NULL;
 }
 
 mtrx_data_i_t apply_mtrx_smtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)

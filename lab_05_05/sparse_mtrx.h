@@ -18,6 +18,7 @@ typedef smtrx_t *smtrx_pt;
 
 void smtrx_init(size_t m, size_t n, smtrx_pt mtrx_p);
 int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c_p);
+list1_t *smtrx_el_list(smtrx_pt m, int i, int j);
 int smtrx_el(smtrx_pt m, int i, int j);
 int smtrx_next(smtrx_pt m, int *i, int *j);
 

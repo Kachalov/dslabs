@@ -34,25 +34,31 @@ int main(int argc, char **argv)
                 mtrx_smtrx(a, &sa);
 
                 smtrx_t sb;
-                mtrx_smtrx(a, &sb);
+                mtrx_smtrx(b, &sb);
 
-                printf("A: ");
-                for (list1_t *l = sa.a; l; l = l->next) {
-                    printf("%d ", l->data);
-                }
-                printf("\n");
+                smtrx_t sc;
+                err = smtrx_mul(&sa, &sb, &sc);
 
-                printf("J: ");
-                for (list1_t *l = sa.j; l; l = l->next) {
-                    printf("%d ", l->data);
-                }
-                printf("\n");
+                if (err == EOK)
+                {
+                    printf("A: ");
+                    for (list1_t *l = sc.a; l; l = l->next) {
+                        printf("%d ", l->data);
+                    }
+                    printf("\n");
 
-                printf("R: ");
-                for (list1_t *l = sa.r; l; l = l->next) {
-                    printf("%d ", l->data);
+                    printf("J: ");
+                    for (list1_t *l = sc.j; l; l = l->next) {
+                        printf("%d ", l->data);
+                    }
+                    printf("\n");
+
+                    printf("R: ");
+                    for (list1_t *l = sc.r; l; l = l->next) {
+                        printf("%d ", l->data);
+                    }
+                    printf("\n");
                 }
-                printf("\n");
             }
         }
     }
