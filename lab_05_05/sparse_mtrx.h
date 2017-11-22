@@ -9,11 +9,10 @@ typedef struct
 {
     int *a;
     int *j;
-    int *r;
+    list1_t *r;
     size_t m;
     size_t n;
     size_t els;
-    size_t rs;
     size_t len;
 } smtrx_t;
 

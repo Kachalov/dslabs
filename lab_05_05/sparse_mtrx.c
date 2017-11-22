@@ -24,12 +24,8 @@ int smtrx_init(size_t m, size_t n, size_t elements, smtrx_pt *mtrx_pp)
     if ((*mtrx_pp)->j == NULL)
         goto oom;
 
-    (*mtrx_pp)->r = calloc(m + 1, sizeof(*(*mtrx_pp)->r));
-    if ((*mtrx_pp)->r == NULL)
-        goto oom;
-
+    (*mtrx_pp)->r = NULL;
     (*mtrx_pp)->els = elements;
-    (*mtrx_pp)->rs = 0;
     (*mtrx_pp)->len = 0;
 
     return EOK;
@@ -43,9 +39,6 @@ int smtrx_init(size_t m, size_t n, size_t elements, smtrx_pt *mtrx_pp)
 
     if ((*mtrx_pp)->j == NULL)
         free((*mtrx_pp)->j);
-
-    if ((*mtrx_pp)->r == NULL)
-        free((*mtrx_pp)->r);
 
     return EOOM;
 }
@@ -71,8 +64,8 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
 
     for (int f = *i; f < *i + 2; f++)
     {
-        int l = m->r[f];
-        int r = m->r[f + 1];
+        int l = list1_get(m->r, f)->data;
+        int r = list1_get(m->r, f + 1)->data;
 
         for (int k = l; k < r; k++)
         {
@@ -140,10 +133,13 @@ int smtrx_el(smtrx_pt m, int i, int j)
 
 int *smtrx_el_list(smtrx_pt m, int i, int j)
 {
-    int l = m->r[i];
-    int r = m->r[i + 1];
+    list1_t *l = list1_get(m->r, i);
+    list1_t *r = list1_get(m->r, i + 1);
 
-    for (int k = l; k < r; k++)
+    if (l == NULL || r == NULL)
+        return NULL;
+
+    for (int k = l->data; k < r->data; k++)
         if (m->j[k] == j)
             return m->a + k;
     return NULL;
@@ -185,26 +181,32 @@ int mtrx_smtrx(mtrxp_t f, smtrx_pt *t_p)
  */
 int _smtrx_add(smtrx_pt m, int i, int j, int data)
 {
-    DPRINT("add(i=%d, j=%d, data=%d)\n", i, j, data);
+    DPRINT("add(i=%d, j=%d, data=%d)", i, j, data);
     m->a[m->len] = data;
     m->j[m->len] = j;
-
-    if (!m->rs)
-    {
-        m->r[0] = 0;
-        m->r[1] = 1;
-        m->rs = 2;
-    }
     m->len++;
 
-    m->r[m->rs - 1] = m->len - 1;
-    for (int a = i + 1 - m->rs; a >= 0; a--)
+    list1_t *tmp = NULL;
+    tmp = m->r;
+    if (tmp == NULL)
     {
-        m->r[m->rs - 1 + a] = m->len - 1;
-        m->rs++;
+        list1_add_tail(&tmp);
+        tmp->data = 0;
+        m->r = tmp;
+
+        list1_add_tail(&tmp);
+        tmp->data = 1;
     }
 
-    m->r[m->rs - 1] = m->len;
+    tmp = list1_get(m->r, list1_len(m->r) - 1);
+    tmp->data = m->len - 1;
+    for (int a = i + 2 - list1_len(m->r); a > 0; a--)
+    {
+        list1_add_tail(&tmp);
+        tmp->data = m->len - 1;
+    }
+
+    tmp->data = m->len;
 
     return EOK;
 }
