@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -Wall -Werror -pedantic -std=c11
-OBJS := lib/list1.o lib/mtrx.o lib/mtrx_apply.o sparse_mtrx.o
+OBJS := lib/list1.o lib/mtrx.o lib/mtrx_apply.o lib/time.o sparse_mtrx.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage

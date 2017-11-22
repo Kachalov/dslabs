@@ -3,6 +3,7 @@
 #include "lib/list1.h"
 #include "lib/mtrx.h"
 #include "lib/errors.h"
+#include "lib/time.h"
 #include "sparse_mtrx.h"
 
 int main(int argc, char **argv)
@@ -13,13 +14,18 @@ int main(int argc, char **argv)
     mtrxp_t b = NULL;
     mtrxp_t c = NULL;
 
+    tick_t begin = 0;
+    tick_t end = 0;
+
     err = read_mtrx(argv[1], &a);
     if (err == EOK)
     {
         err = read_mtrx(argv[2], &b);
         if (err == EOK)
         {
+            begin = tick();
             err = mul_mtrx(a, b, &c);
+            end = tick();
             if (err == EOK)
             {
                 printf("A mtrx:\n");
@@ -28,6 +34,7 @@ int main(int argc, char **argv)
                 print_mtrx(b);
                 printf("\nResult:\n");
                 print_mtrx(c);
+                printf("Ticks: %zu\n", end - begin);
                 printf("\n");
 
                 smtrx_t sa;
@@ -36,8 +43,10 @@ int main(int argc, char **argv)
                 smtrx_t sb;
                 mtrx_smtrx(b, &sb);
 
+                begin = tick();
                 smtrx_t sc;
                 err = smtrx_mul(&sa, &sb, &sc);
+                end = tick();
 
                 if (err == EOK)
                 {
@@ -58,6 +67,8 @@ int main(int argc, char **argv)
                         printf("%d ", l->data);
                     }
                     printf("\n");
+
+                    printf("Ticks: %zu\n", end - begin);
                 }
             }
         }
