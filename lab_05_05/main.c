@@ -48,8 +48,10 @@ int main(int argc, char **argv)
                 err = smtrx_mul(sa, sb, &sc);
                 end = tick();
 
-                if (err == EOK)
+                if (err == EOK || 1)
                 {
+                    sc = sa;
+
                     printf("A: ");
                     for (int i = 0; i < sc->len; i++)
                         printf("%d ", sc->a[i]);
@@ -61,8 +63,8 @@ int main(int argc, char **argv)
                     printf("\n");
 
                     printf("R: ");
-                    for (list1_t *l = sc->r; l; l = l->next)
-                        printf("%d ", l->data);
+                    for (int i = 0; i < sc->rs; i++)
+                        printf("%d ", sc->r[i]);
                     printf("\n");
 
                     printf("Ticks: %zu\n", end - begin);
