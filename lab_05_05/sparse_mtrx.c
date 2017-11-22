@@ -101,21 +101,25 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     smtrx_init(a->m, b->n, a->n, c);
 
     int *el = NULL;
+    int border = 0;
 
-    int ai = -1;
-    int aj = -1;
-    for (int av = smtrx_next(a, &ai, &aj); ai != a->m; av = smtrx_next(a, &ai, &aj))
+    list1_t *lb = list1_get(b->r, 0);
+    list1_t *rb = list1_get(b->r, 1);
+    for (int i = 0; i < a->els; i++)
     {
-        for (int bj = 0; bj < b->n; bj++)
+        border = rb->data - lb->data;
+        lb = lb->next;
+        rb = rb->next;
+        for (int j = 0; j < border; j++)
         {
-            int bv = smtrx_el(b, aj, bj);
-            if ((el = smtrx_el_list(*c, ai, bj)) == NULL)
+            printf("%d %d %d %d\n", i, a->j[i], j, b->j[j]);
+            if ((el = smtrx_el_list(*c, 0, j)) == NULL)
             {
-                _smtrx_add(*c, ai, bj, av * bv);
+                _smtrx_add(*c, 0, j, a->a[i] * smtrx_el(b, a->j[i], b->j[j]));
             }
             else
             {
-                *el += av * bv;
+                *el += a->a[i] * smtrx_el(b, a->j[i], b->j[j]);
             }
         }
     }
