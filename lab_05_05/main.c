@@ -37,39 +37,38 @@ int main(int argc, char **argv)
                 printf("Ticks: %zu\n", end - begin);
                 printf("\n");
 
-                smtrx_t sa;
+                smtrx_pt sa;
                 mtrx_smtrx(a, &sa);
 
-                smtrx_t sb;
+                smtrx_pt sb;
                 mtrx_smtrx(b, &sb);
 
                 begin = tick();
-                smtrx_t sc;
-                err = smtrx_mul(&sa, &sb, &sc);
+                smtrx_pt sc;
+                err = smtrx_mul(sa, sb, &sc);
                 end = tick();
 
                 if (err == EOK)
                 {
                     printf("A: ");
-                    for (list1_t *l = sc.a; l; l = l->next) {
-                        printf("%d ", l->data);
-                    }
+                    for (int i = 0; i < sc->len; i++)
+                        printf("%d ", sc->a[i]);
                     printf("\n");
 
                     printf("J: ");
-                    for (list1_t *l = sc.j; l; l = l->next) {
-                        printf("%d ", l->data);
-                    }
+                    for (int i = 0; i < sc->len; i++)
+                        printf("%d ", sc->j[i]);
                     printf("\n");
 
                     printf("R: ");
-                    for (list1_t *l = sc.r; l; l = l->next) {
+                    for (list1_t *l = sc->r; l; l = l->next)
                         printf("%d ", l->data);
-                    }
                     printf("\n");
 
                     printf("Ticks: %zu\n", end - begin);
                 }
+
+
             }
         }
     }

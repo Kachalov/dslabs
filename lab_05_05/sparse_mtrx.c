@@ -6,15 +6,48 @@
 #include "lib/debug.h"
 #include "lib/errors.h"
 
-void smtrx_init(size_t m, size_t n, smtrx_pt mtrx_p)
+int smtrx_init(size_t m, size_t n, size_t elements, smtrx_pt *mtrx_pp)
 {
-    assert(mtrx_p != NULL);
+    assert(mtrx_pp != NULL);
 
-    mtrx_p->m = m;
-    mtrx_p->n = n;
-    mtrx_p->a = NULL;
-    mtrx_p->j = NULL;
-    mtrx_p->r = NULL;
+    *mtrx_pp = malloc(sizeof(smtrx_t));
+    if (*mtrx_pp == NULL)
+        goto oom;
+
+    (*mtrx_pp)->m = m;
+    (*mtrx_pp)->n = n;
+    (*mtrx_pp)->a = calloc(elements, sizeof(*(*mtrx_pp)->a));
+    if ((*mtrx_pp)->a == NULL)
+        goto oom;
+
+    (*mtrx_pp)->j = calloc(elements, sizeof(*(*mtrx_pp)->j));
+    if ((*mtrx_pp)->j == NULL)
+        goto oom;
+
+    (*mtrx_pp)->r = NULL;
+    (*mtrx_pp)->els = elements;
+    (*mtrx_pp)->len = 0;
+
+    return EOK;
+
+    oom:
+    if (*mtrx_pp != NULL)
+        free(*mtrx_pp);
+
+    if ((*mtrx_pp)->a == NULL)
+        free((*mtrx_pp)->a);
+
+    if ((*mtrx_pp)->j == NULL)
+        free((*mtrx_pp)->j);
+
+    return EOOM;
+}
+
+void smtrx_delete(smtrx_pt *mtrx_pp)
+{
+    if (*mtrx_pp)
+        free(*mtrx_pp);
+    *mtrx_pp = NULL;
 }
 
 int smtrx_next(smtrx_pt m, int *i, int *j)
@@ -36,12 +69,12 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
 
         for (int k = l; k < r; k++)
         {
-            tmp = list1_get(m->j, k)->data;
+            tmp = m->j[k];
             if (use_next)
             {
                 *i = f;
                 *j = tmp;
-                return list1_get(m->a, k)->data;
+                return m->a[k];
             }
 
             if (tmp == *j)
@@ -54,9 +87,9 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
     return 0;
 }
 
-int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
+int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
 {
-    smtrx_init(0, 0, c);
+    *c = NULL;
 
     // Only vector
     if (a->m != 1)
@@ -65,9 +98,9 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
     if (a->n != b->m)
         return EMTRXSIZE;
 
-    smtrx_init(a->m, b->n, c);
+    smtrx_init(a->m, b->n, a->n, c);
 
-    list1_t *el = NULL;
+    int *el = NULL;
 
     int ai = -1;
     int aj = -1;
@@ -76,13 +109,13 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
         for (int bj = 0; bj < b->n; bj++)
         {
             int bv = smtrx_el(b, aj, bj);
-            if ((el = smtrx_el_list(c, ai, bj)) == NULL)
+            if ((el = smtrx_el_list(*c, ai, bj)) == NULL)
             {
-                _smtrx_add(c, ai, bj, av * bv);
+                _smtrx_add(*c, ai, bj, av * bv);
             }
             else
             {
-                el->data += av * bv;
+                *el += av * bv;
             }
         }
     }
@@ -92,24 +125,23 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt c)
 
 int smtrx_el(smtrx_pt m, int i, int j)
 {
-    list1_t * list = smtrx_el_list(m, i, j);
+    int *list = smtrx_el_list(m, i, j);
     if (list)
-        return list->data;
+        return *list;
     return 0;
 }
 
-list1_t *smtrx_el_list(smtrx_pt m, int i, int j)
+int *smtrx_el_list(smtrx_pt m, int i, int j)
 {
     list1_t *l = list1_get(m->r, i);
     list1_t *r = list1_get(m->r, i + 1);
-    list1_t *el = NULL;
 
     if (l == NULL || r == NULL)
         return NULL;
 
     for (int k = l->data; k < r->data; k++)
-        if ((el = list1_get(m->j, k)) != NULL && el->data == j)
-            return list1_get(m->a, k);
+        if (m->j[k] == j)
+            return m->a + k;
     return NULL;
 }
 
@@ -121,10 +153,20 @@ mtrx_data_i_t apply_mtrx_smtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, voi
     return mtrx_p->d[i][j];
 }
 
-int mtrx_smtrx(mtrxp_t f, smtrx_pt t)
+mtrx_data_i_t apply_mtrx_smtrx_count(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
 {
-    smtrx_init(f->m, f->n, t);
-    apply_mtrx(f, apply_mtrx_smtrx, t);
+    int *els = (int *)arg;
+    if (mtrx_p->d[i][j])
+        (*els)++;
+    return mtrx_p->d[i][j];
+}
+
+int mtrx_smtrx(mtrxp_t f, smtrx_pt *t_p)
+{
+    int els = 0;
+    apply_mtrx(f, apply_mtrx_smtrx_count, &els);
+    smtrx_init(f->m, f->n, els, t_p);
+    apply_mtrx(f, apply_mtrx_smtrx, *t_p);
 
     return EOK;
 }
@@ -140,20 +182,11 @@ int mtrx_smtrx(mtrxp_t f, smtrx_pt t)
 int _smtrx_add(smtrx_pt m, int i, int j, int data)
 {
     DPRINT("add(i=%d, j=%d, data=%d)", i, j, data);
-    list1_t *tmp;
+    m->a[m->len] = data;
+    m->j[m->len] = j;
+    m->len++;
 
-    tmp = m->a;
-    list1_add_tail(&tmp);
-    tmp->data = data;
-    if (m->a == NULL)
-        m->a = tmp;
-
-    tmp = m->j;
-    list1_add_tail(&tmp);
-    tmp->data = j;
-    if (m->j == NULL)
-        m->j = tmp;
-
+    list1_t *tmp = NULL;
     tmp = m->r;
     if (tmp == NULL)
     {
@@ -166,14 +199,14 @@ int _smtrx_add(smtrx_pt m, int i, int j, int data)
     }
 
     tmp = list1_get(m->r, list1_len(m->r) - 1);
-    tmp->data = list1_len(m->j) - 1;
+    tmp->data = m->len - 1;
     for (int a = i + 2 - list1_len(m->r); a > 0; a--)
     {
         list1_add_tail(&tmp);
-        tmp->data = list1_len(m->j) - 1;
+        tmp->data = m->len - 1;
     }
 
-    tmp->data = list1_len(m->j);
+    tmp->data = m->len;
 
     return EOK;
 }
