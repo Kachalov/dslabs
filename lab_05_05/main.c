@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 
 #include "lib/list1.h"
 #include "lib/mtrx.h"
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
                 print_mtrx(b);
                 printf("\nResult:\n");
                 print_mtrx(c);
-                printf("Ticks: %zu\n", end - begin);
+                printf("Ticks: %"PRIu64"\n", end - begin);
                 printf("\n");
 
                 smtrx_pt sa;
@@ -42,6 +43,21 @@ int main(int argc, char **argv)
 
                 smtrx_pt sb;
                 mtrx_smtrx(b, &sb);
+
+                printf("A: ");
+                for (int i = 0; i < sa->len; i++)
+                    printf("%d ", sa->a[i]);
+                printf("\n");
+
+                printf("J: ");
+                for (int i = 0; i < sa->len; i++)
+                    printf("%d ", sa->j[i]);
+                printf("\n");
+
+                printf("R: ");
+                for (list1_t *l = sa->r; l; l = l->next)
+                    printf("%d ", l->data);
+                printf("\n");
 
                 begin = tick();
                 smtrx_pt sc;
@@ -65,7 +81,7 @@ int main(int argc, char **argv)
                         printf("%d ", l->data);
                     printf("\n");
 
-                    printf("Ticks: %zu\n", end - begin);
+                    printf("Ticks: %"PRIu64"\n", end - begin);
                 }
 
 
