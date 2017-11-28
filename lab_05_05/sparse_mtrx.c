@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include "sparse_mtrx.h"
 #include "lib/mtrx.h"
 #include "lib/debug.h"
 #include "lib/errors.h"
+#include "lib/time.h"
 
 int smtrx_init(size_t m, size_t n, size_t elements, smtrx_pt *mtrx_pp)
 {
@@ -55,6 +57,9 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
     int tmp = 0;
     int use_next = 0;
 
+    if (*i == m->m || *j == m->n)
+        return 0;
+
     if (*i < 0 || *j < 0)
     {
         *i = 0;
@@ -62,12 +67,15 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
         use_next = 1;
     }
 
+    list1_t *l = list1_get(m->r, *i);
+    list1_t *r = l == NULL ? NULL : l->next;
     for (int f = *i; f < *i + 2; f++)
     {
-        int l = list1_get(m->r, f)->data;
-        int r = list1_get(m->r, f + 1)->data;
+        assert(l != NULL && r != NULL);
+        if (l == NULL || r == NULL)
+            break;
 
-        for (int k = l; k < r; k++)
+        for (int k = l->data; k < r->data; k++)
         {
             tmp = m->j[k];
             if (use_next)
@@ -80,6 +88,8 @@ int smtrx_next(smtrx_pt m, int *i, int *j)
             if (tmp == *j)
                 use_next = 1;
         }
+        l = r;
+        r = r == NULL ? NULL : r->next;
     }
 
     *i = m->m;
@@ -100,25 +110,48 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
 
     smtrx_init(a->m, b->n, a->n, c);
 
-    int *el = NULL;
+    int i = 0;
+    int j = 0;
 
-    int ai = -1;
-    int aj = -1;
-    for (int av = smtrx_next(a, &ai, &aj); ai != a->m; av = smtrx_next(a, &ai, &aj))
+    list1_t *la = list1_get(a->r, 0);
+    list1_t *ra = la->next == NULL ? NULL : la->next;
+    list1_t *lb = list1_get(b->r, a->j[la->data]);
+    list1_t *rb = lb->next == NULL ? NULL : lb->next;
+
+    int *res = malloc(b->n * sizeof(*a->a));
+    for (int j = 0; j < b->n; j++)
+        res[j] = 0;
+
+    printf("%d %d | %d %d\n", a->m, a->n, b->m, b->n);
     {
-        for (int bj = 0; bj < b->n; bj++)
+        int i = 0;
+
+        tick_t at = tick();
+        for (int ai = la->data; ai < ra->data; ai++)
         {
-            int bv = smtrx_el(b, aj, bj);
-            if ((el = smtrx_el_list(*c, ai, bj)) == NULL)
+            if (lb == NULL || rb == NULL)
+                break;
+
+            i = a->j[ai];
+            for (int bj = lb->data; bj < rb->data; bj++)
             {
-                _smtrx_add(*c, ai, bj, av * bv);
+                j = b->j[bj];
+                res[j] += a->a[ai] * b->a[bj];
             }
-            else
+
+            for (int _i = 0; _i < a->j[ai + 1] - i; _i++)
             {
-                *el += av * bv;
+                lb = rb;
+                rb = lb->next == NULL ? NULL : lb->next;
             }
         }
+        printf("SMTRX: %"PRIu64"\n", tick() - at);
     }
+
+    for (int i = 0; i < b->n; i++)
+        if (res[i])
+            _smtrx_add(*c, 0, i, res[i]);
+    free(res);
 
     return EOK;
 }
@@ -134,12 +167,17 @@ int smtrx_el(smtrx_pt m, int i, int j)
 int *smtrx_el_list(smtrx_pt m, int i, int j)
 {
     list1_t *l = list1_get(m->r, i);
-    list1_t *r = list1_get(m->r, i + 1);
 
-    if (l == NULL || r == NULL)
+    if (l == NULL)
         return NULL;
 
-    for (int k = l->data; k < r->data; k++)
+    list1_t *r = l->next;
+
+    if (r == NULL)
+        return NULL;
+
+    int end = r->data;
+    for (int k = l->data; k < end; k++)
         if (m->j[k] == j)
             return m->a + k;
     return NULL;
