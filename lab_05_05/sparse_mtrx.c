@@ -115,23 +115,34 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
 
     list1_t *la = list1_get(a->r, 0);
     list1_t *ra = la->next == NULL ? NULL : la->next;
-    list1_t *lb = list1_get(b->r, 0);
+    list1_t *lb = list1_get(b->r, a->j[la->data]);
     list1_t *rb = lb->next == NULL ? NULL : lb->next;
 
-    int *res = calloc(b->n, sizeof(*a->a));
+    int *res = malloc(b->n * sizeof(*a->a));
     for (int j = 0; j < b->n; j++)
         res[j] = 0;
 
+    printf("%d %d | %d %d\n", a->m, a->n, b->m, b->n);
     {
         int i = 0;
 
         tick_t at = tick();
         for (int ai = la->data; ai < ra->data; ai++)
         {
+            if (lb == NULL || rb == NULL)
+                break;
+
             i = a->j[ai];
-            for (int j = 0; j < b->n; j++)
+            for (int bj = lb->data; bj < rb->data; bj++)
             {
-                res[j] += a->a[ai] * smtrx_el(b, i, j);
+                j = b->j[bj];
+                res[j] += a->a[ai] * b->a[bj];
+            }
+
+            for (int _i = 0; _i < a->j[ai + 1] - i; _i++)
+            {
+                lb = rb;
+                rb = lb->next == NULL ? NULL : lb->next;
             }
         }
         printf("SMTRX: %"PRIu64"\n", tick() - at);
