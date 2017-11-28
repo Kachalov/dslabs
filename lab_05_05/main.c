@@ -52,16 +52,18 @@ int main(int argc, char **argv)
 
                 smtrx_pt sa;
                 mtrx_smtrx(a, &sa);
-                printf("A mtrx:\n");
-                smtrx_print(sa);
-
+                
                 smtrx_pt sb;
                 mtrx_smtrx(b, &sb);
-                printf("\nB mtrx:\n");
-                smtrx_print(sb);
 
                 smtrx_pt sc;
                 err = smtrx_mul(sa, sb, &sc);
+
+                printf("A mtrx:\n");
+                smtrx_print(sa);
+
+                printf("\nB mtrx:\n");
+                smtrx_print(sb);
 
                 if (err == EOK)
                 {

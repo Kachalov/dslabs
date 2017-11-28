@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <math.h>
 
 #include "sparse_mtrx.h"
 #include "lib/mtrx.h"
@@ -78,7 +79,6 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
         res[j] = 0;
 
     {
-        int i = 0;
 
         tick_t at = tick();
         for (int ai = la->data; ai < ra->data; ai++)
@@ -103,7 +103,7 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     }
 
     for (int i = 0; i < b->n; i++)
-        if (fabs(res[i]) > 1e-7)
+        if (fabsf(res[i]) > 1e-7)
             _smtrx_add(*c, 0, i, res[i]);
     free(res);
 
