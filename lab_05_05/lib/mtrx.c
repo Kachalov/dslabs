@@ -148,7 +148,7 @@ int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
             for (int i = 0; i < a->m; i++)
                 for (int j = 0; j < b->n; j++)
                     (*c_p)->d[i][j] = mul_i_mtrx(a, b, i, j);
-            printf("MTRX: %"PRIu64"\n", tick() - at);
+            printf("Ticks MTRX: %"PRIu64"\n", tick() - at);
         }
     }
 

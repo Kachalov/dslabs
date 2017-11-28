@@ -7,6 +7,24 @@
 #include "lib/time.h"
 #include "sparse_mtrx.h"
 
+void smtrx_print(smtrx_pt sc)
+{
+    printf("A: ");
+    for (int i = 0; i < sc->len; i++)
+        printf("%.2f ", sc->a[i]);
+    printf("\n");
+
+    printf("J: ");
+    for (int i = 0; i < sc->len; i++)
+        printf("%d ", sc->j[i]);
+    printf("\n");
+
+    printf("R: ");
+    for (list1_t *l = sc->r; l; l = l->next)
+        printf("%d ", l->data);
+    printf("\n");
+}
+
 int main(int argc, char **argv)
 {
     int err = EOK;
@@ -15,18 +33,13 @@ int main(int argc, char **argv)
     mtrxp_t b = NULL;
     mtrxp_t c = NULL;
 
-    tick_t begin = 0;
-    tick_t end = 0;
-
     err = read_mtrx(argv[1], &a);
     if (err == EOK)
     {
         err = read_mtrx(argv[2], &b);
         if (err == EOK)
         {
-            begin = tick();
             err = mul_mtrx(a, b, &c);
-            end = tick();
             if (err == EOK)
             {
                 printf("A mtrx:\n");
@@ -35,53 +48,25 @@ int main(int argc, char **argv)
                 print_mtrx(b);
                 printf("\nResult:\n");
                 print_mtrx(c);
-                printf("Ticks: %"PRIu64"\n", end - begin);
                 printf("\n");
 
                 smtrx_pt sa;
                 mtrx_smtrx(a, &sa);
+                printf("A mtrx:\n");
+                smtrx_print(sa);
 
                 smtrx_pt sb;
                 mtrx_smtrx(b, &sb);
+                printf("\nB mtrx:\n");
+                smtrx_print(sb);
 
-                printf("A: ");
-                for (int i = 0; i < sa->len; i++)
-                    printf("%d ", sa->a[i]);
-                printf("\n");
-
-                printf("J: ");
-                for (int i = 0; i < sa->len; i++)
-                    printf("%d ", sa->j[i]);
-                printf("\n");
-
-                printf("R: ");
-                for (list1_t *l = sa->r; l; l = l->next)
-                    printf("%d ", l->data);
-                printf("\n");
-
-                begin = tick();
                 smtrx_pt sc;
                 err = smtrx_mul(sa, sb, &sc);
-                end = tick();
 
                 if (err == EOK)
                 {
-                    printf("A: ");
-                    for (int i = 0; i < sc->len; i++)
-                        printf("%d ", sc->a[i]);
-                    printf("\n");
-
-                    printf("J: ");
-                    for (int i = 0; i < sc->len; i++)
-                        printf("%d ", sc->j[i]);
-                    printf("\n");
-
-                    printf("R: ");
-                    for (list1_t *l = sc->r; l; l = l->next)
-                        printf("%d ", l->data);
-                    printf("\n");
-
-                    printf("Ticks: %"PRIu64"\n", end - begin);
+                    printf("\nResult:\n");
+                    smtrx_print(sc);
                 }
 
 
