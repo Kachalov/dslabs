@@ -8,6 +8,7 @@
 int main(int argc, char **argv)
 {
     srand(time(NULL));
+    rand();
     operate(stdout, argc == 2 ? (strcmp(argv[1], "-v") == 0) : 0);
 
     return 0;

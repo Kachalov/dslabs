@@ -21,7 +21,7 @@ void operate(FILE *fout, int verbose)
     QUEUE_PUSH(q, unit);
 
     float time = 0;
-    float time_t1 = random_time(T1B, T1E);
+    float time_t1 = 0;//random_time(T1B, T1E);
 
     float rnd = 0;
 
@@ -32,6 +32,7 @@ void operate(FILE *fout, int verbose)
     int rnd_num_t2 = 0;
 
     float rnd_t3 = unit.time;
+    int rnd_num_t3 = 1;
 
     float units_sum = 0;
     float time_sum = 0;
@@ -43,6 +44,7 @@ void operate(FILE *fout, int verbose)
     int units_out = 0;
     int units_t1_out = 0;
     int units_t1_in = 0;
+    int units_t2_in = 0;
     int print_last = 0;
 
 
@@ -82,8 +84,12 @@ void operate(FILE *fout, int verbose)
             if (unit.type == T2)
             {
                 units_in++;
+                units_t2_in++;
+                unit.time = random_time(T3B, T3E);
                 unit.time_added = time - unit.time;
                 QUEUE_INSERT(q, unit);
+                rnd_num_t3++;
+                rnd_t3 += unit.time;
             }
             else
                 units_t1_out++;
@@ -121,10 +127,10 @@ void operate(FILE *fout, int verbose)
     }
 
     printf("Avg T1(%.2f) T2(%.2f) T3(%.2f)\n",
-           rnd_t1 / rnd_num_t1, rnd_t2 / rnd_num_t2, rnd_t3);
+           rnd_t1 / rnd_num_t1, rnd_t2 / rnd_num_t2, rnd_t3 / rnd_num_t3);
     printf("T1: in(%d) out(%d)\n", units_t1_in, units_t1_out);
     printf("T2: %d (expected ±3%%: %.2f-%0.2f)\n",
-           units_out - units_t1_out, 0.97 * UNITS / 4, 1.03 * UNITS / 4);
+           units_t2_in, 0.97 * UNITS / 4, 1.03 * UNITS / 4);
     printf("Total time: %.2f (expected ±3%%: %.2f-%0.2f)\n",
            time, time_expected * 0.97, time_expected * 1.03);
     printf("Time idle: %.2f\n", time_idle);
@@ -137,6 +143,6 @@ float random_time(float a, float b)
     #ifdef NORND
         return (a + b) / 2;
     #else
-        return ((float)rand()/(float)(RAND_MAX)) * (a + b) - a;
+        return ((float)rand()/(float)(RAND_MAX)) * (b - a) + a;
     #endif
 }

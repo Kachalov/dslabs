@@ -32,7 +32,7 @@
     #define QUEUE_INIT(q_ptr) queue_lst_init(&(q_ptr), sizeof(unit_t))
     #define QUEUE_PUSH(q, unit) queue_lst_push(q, &(unit))
     #define QUEUE_POP(q, unit) queue_lst_pop(q, &(unit))
-    #define QUEUE_INSERT(q, unit) queue_lst_insert(q, MAX_POS - 1, &(unit))
+    #define QUEUE_INSERT(q, unit) queue_lst_insert(q, MAX_POS, &(unit))
     #define QUEUE_DELETE(q) queue_lst_delete(&(q))
 #else
     #define QUEUE_TYPE queue_arr_t
@@ -40,7 +40,7 @@
     #define QUEUE_INIT(q_ptr) queue_arr_init(&(q_ptr), QUEUE_SIZE, sizeof(unit_t))
     #define QUEUE_PUSH(q, unit) queue_arr_push(q, &(unit))
     #define QUEUE_POP(q, unit) queue_arr_pop(q, &(unit))
-    #define QUEUE_INSERT(q, unit) queue_arr_insert(q, MAX_POS - 1, &(unit))
+    #define QUEUE_INSERT(q, unit) queue_arr_insert(q, MAX_POS, &(unit))
     #define QUEUE_DELETE(q) queue_arr_delete(&(q))
 #endif
 
