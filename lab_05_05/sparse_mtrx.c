@@ -78,9 +78,8 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     for (int j = 0; j < b->n; j++)
         res[j] = 0;
 
+    tick_t at = tick();
     {
-
-        tick_t at = tick();
         for (int ai = la->data; ai < ra->data; ai++)
         {
             if (lb == NULL || rb == NULL)
@@ -99,8 +98,8 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
                 rb = lb->next == NULL ? NULL : lb->next;
             }
         }
-        printf("Ticks SMTRX: %"PRIu64"\n", tick() - at);
     }
+    printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", tick() - at);
 
     for (int i = 0; i < b->n; i++)
         if (fabsf(res[i]) > 1e-7)
@@ -110,12 +109,36 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     return EOK;
 }
 
+float smtrx_el(smtrx_pt m, int i, int j)
+{
+    list1_t *l = list1_get(m->r, i);
+
+    if (l == NULL)
+        return 0;
+
+    list1_t *r = l->next;
+
+    if (r == NULL)
+        return 0;
+
+    int end = r->data;
+    for (int k = l->data; k < end; k++)
+        if (m->j[k] == j)
+            return m->a[k];
+    return 0;
+}
+
 mtrx_data_i_t apply_mtrx_smtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
 {
     smtrx_pt smtrx_p = (smtrx_pt)arg;
     if (mtrx_p->d[i][j])
         _smtrx_add(smtrx_p, i, j, mtrx_p->d[i][j]);
     return mtrx_p->d[i][j];
+}
+
+mtrx_data_i_t apply_mtrx_mtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
+{
+    return smtrx_el((smtrx_pt)arg, i, j);
 }
 
 mtrx_data_i_t apply_mtrx_smtrx_count(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg)
@@ -129,9 +152,17 @@ mtrx_data_i_t apply_mtrx_smtrx_count(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t 
 int mtrx_smtrx(mtrxp_t f, smtrx_pt *t_p)
 {
     int els = 0;
+
     apply_mtrx(f, apply_mtrx_smtrx_count, &els);
     smtrx_init(f->m, f->n, els, t_p);
     apply_mtrx(f, apply_mtrx_smtrx, *t_p);
+
+    return EOK;
+}
+
+int smtrx_mtrx(smtrx_pt f, mtrxp_t *t_p)
+{
+    alloc_mtrx(f->m, f->n, t_p, apply_mtrx_mtrx, f);
 
     return EOK;
 }
