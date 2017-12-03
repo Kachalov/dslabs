@@ -1,21 +1,32 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include "avl.h"
 
-node_t *node_init(char k)
+node_t *node_init(char *k)
 {
-    node_t *p = malloc(sizeof(node_t));
+    node_t *p = malloc(sizeof(node_t) + strlen(k) + 1);
     if (!p)
         return NULL;
 
-    p->key = k;
+    p->key = (void *)(p + 1);
+    strcpy(p->key, k);
     p->h = 1;
     p->l = NULL;
     p->r = NULL;
 
     return p;
+}
+
+int node_key_cmp(char *pk, char *qk)
+{
+    assert(pk);
+    assert(qk);
+
+    fprintf(stderr, "'%s' %d '%s'\n", pk, strcmp(pk, qk), qk);
+    return -strcmp(pk, qk);
 }
 
 uint8_t height(node_t *p)
@@ -76,7 +87,7 @@ node_t *balance(node_t *p)
 
     fix_height(p);
 
-    if(bfactor(p)==2)
+    if(bfactor(p) == 2)
     {
         if(bfactor(p->r) < 0)
             p->r = rotate_right(p->r);
@@ -95,12 +106,12 @@ node_t *balance(node_t *p)
     return p;
 }
 
-node_t *insert(node_t *p, char k)
+node_t *insert(node_t *p, char *k)
 {
     if(!p)
         return node_init(k);
 
-    if(k<p->key)
+    if(node_key_cmp(k, p->key) < 0)
         p->l = insert(p->l, k);
     else
         p->r = insert(p->r, k);
@@ -127,14 +138,14 @@ node_t *remove_min(node_t *p)
     return balance(p);
 }
 
-node_t *remove_key(node_t *p, char k)
+node_t *remove_key(node_t *p, char *k)
 {
     if(!p)
         return 0;
 
-    if(k < p->key)
+    if(node_key_cmp(k, p->key) < 0)
         p->l = remove_key(p->l, k);
-    else if(k > p->key)
+    else if(node_key_cmp(k, p->key) > 0)
         p->r = remove_key(p->r, k);
     else
     {
@@ -165,13 +176,46 @@ void print_nodes(node_t *p)
 
     if (!p->l && !p->r)
     {
-        printf("%c", p->key);
+        printf("%s", p->key);
         return;
     }
 
     printf("(");
     print_nodes(p->l);
-    printf(" %c ", p->key);
+    printf(" %s ", p->key);
     print_nodes(p->r);
     printf(")");
 }
+
+void print_nodes_dot_rec(node_t *p)
+{
+    if (!p)
+        return;
+
+    if (!p->l && !p->r)
+    {
+        printf("    \"%s\";\n", p->key);
+        return;
+    }
+
+    if (p->r)
+    {
+        printf("    \"%s\" -> \"%s\" [color=blue];\n", p->key, p->r->key);
+        print_nodes_dot_rec(p->r);
+    }
+
+    if (p->l)
+    {
+        printf("    \"%s\" -> \"%s\" [color=red];\n", p->key, p->l->key);
+        print_nodes_dot_rec(p->l);
+    }
+}
+
+void print_nodes_dot(node_t *p)
+{
+    printf("digraph graphname {\n");
+    print_nodes_dot_rec(p);
+    printf("}\n");
+}
+
+
