@@ -11,7 +11,7 @@ void smtrx_print(smtrx_pt sc)
 {
     printf("A: ");
     for (int i = 0; i < sc->len; i++)
-        printf("%.2f ", sc->a[i]);
+        printf("%.3f ", sc->a[i]);
     printf("\n");
 
     printf("J: ");
@@ -83,22 +83,22 @@ int main(int argc, char **argv)
             if (err == EOK)
             {
                 printf("A mtrx:\n");
-                if (a->n <= 5)
+                if (a->m <= 10 && a->n <= 5)
                     print_mtrx(a);
                 else
-                    printf("Too wide");
+                    printf("Too large");
 
                 printf("\nB mtrx:\n");
-                if (b->n <= 5)
+                if (b->m <= 10 && b->n <= 5)
                     print_mtrx(b);
                 else
-                    printf("Too wide");
+                    printf("Too large");
 
                 printf("\nResult:\n");
-                if (c->n <= 5)
+                if (c->m <= 10 && c->n <= 5)
                     print_mtrx(c);
                 else
-                    printf("Too wide");
+                    printf("Too large");
                 printf("\n\n");
 
                 smtrx_pt sa;
