@@ -25,7 +25,6 @@ int node_key_cmp(char *pk, char *qk)
     assert(pk);
     assert(qk);
 
-    fprintf(stderr, "'%s' %d '%s'\n", pk, strcmp(pk, qk), qk);
     return -strcmp(pk, qk);
 }
 
@@ -164,6 +163,20 @@ node_t *remove_key(node_t *p, char *k)
     }
 
     return balance(p);
+}
+
+node_t *remove_first_letter(node_t *p, char let)
+{
+    if (!p)
+        return p;
+
+    p->l = remove_first_letter(p->l, let);
+    p->r = remove_first_letter(p->r, let);
+
+    if (*p->key == let)
+        p = remove_key(p, p->key);
+
+    return p;
 }
 
 void print_nodes(node_t *p)
