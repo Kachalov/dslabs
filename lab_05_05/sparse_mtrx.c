@@ -66,8 +66,6 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     if (a->n != b->m)
         return EMTRXSIZE;
 
-    smtrx_init(a->m, b->n, a->n, c);
-
     int i = 0;
     int j = 0;
 
@@ -102,6 +100,12 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
         }
     }
     ticks = tick() - at;
+
+    int els = 0;
+    for (int i = 0; i < b->n; i++)
+        if (fabsf(res[i]) > 1e-7)
+            els++;
+    smtrx_init(a->m, b->n, els, c);
 
     for (int i = 0; i < b->n; i++)
         if (fabsf(res[i]) > 1e-7)
@@ -171,7 +175,7 @@ int smtrx_mtrx(smtrx_pt f, mtrxp_t *t_p)
 
 float smtrx_sparse(smtrx_pt m)
 {
-    return (float)m->els/m->m/m->n;
+    return 1 - (float)m->len/m->m/m->n;
 }
 
 /**

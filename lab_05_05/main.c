@@ -26,7 +26,7 @@ void smtrx_print(smtrx_pt sc)
         printf("%d ", l->data);
     printf("\n");
 
-    printf("Sparse: %.1f%%\n", 100 * smtrx_sparse(sc));
+    printf("Sparse: %.3f%%\n", 100 * smtrx_sparse(sc));
 }
 
 int mtrx_read(mtrxp_t *m_p)
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
                 smtrx_delete(&sb);
                 smtrx_delete(&sc);
 
-                printf("\nTicks MTRX: \033[1;31m%"PRIu64"\033[0m\n", ticks_mtrx);
+                printf("\nTicks  MTRX: \033[1;31m%"PRIu64"\033[0m\n", ticks_mtrx);
                 printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", ticks_smtrx);
             }
         }
