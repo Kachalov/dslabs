@@ -7,6 +7,8 @@
 #include "lib/time.h"
 #include "sparse_mtrx.h"
 
+extern tick_t ticks;
+
 void smtrx_print(smtrx_pt sc)
 {
     printf("A: ");
@@ -69,6 +71,9 @@ int main(int argc, char **argv)
 {
     int err = EOK;
 
+    tick_t ticks_mtrx = 0;
+    tick_t ticks_smtrx = 0;
+
     mtrxp_t a = NULL;
     mtrxp_t b = NULL;
     mtrxp_t c = NULL;
@@ -82,6 +87,7 @@ int main(int argc, char **argv)
         if (err == EOK)
         {
             err = mul_mtrx(a, b, &c);
+            ticks_mtrx = ticks;
             if (err == EOK)
             {
                 printf("A mtrx:\n");
@@ -111,6 +117,7 @@ int main(int argc, char **argv)
 
                 smtrx_pt sc;
                 err = smtrx_mul(sa, sb, &sc);
+                ticks_smtrx = ticks;
 
                 printf("A mtrx:\n");
                 smtrx_print(sa);
@@ -123,6 +130,13 @@ int main(int argc, char **argv)
                     printf("\nResult:\n");
                     smtrx_print(sc);
                 }
+
+                smtrx_delete(&sa);
+                smtrx_delete(&sb);
+                smtrx_delete(&sc);
+
+                printf("\nTicks MTRX: \033[1;31m%"PRIu64"\033[0m\n", ticks_mtrx);
+                printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", ticks_smtrx);
             }
         }
     }

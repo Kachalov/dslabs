@@ -11,6 +11,8 @@
 #include "errors.h"
 #include "time.h"
 
+extern tick_t ticks;
+
 int alloc_mtrx(mtrx_size_t m, mtrx_size_t n, mtrxp_t *mtrx_pp,
                apply_mtrx_f_t f, void *arg)
 {
@@ -148,7 +150,7 @@ int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
             for (int i = 0; i < a->m; i++)
                 for (int j = 0; j < b->n; j++)
                     (*c_p)->d[i][j] = mul_i_mtrx(a, b, i, j);
-            printf("Ticks MTRX: \033[1;31m%"PRIu64"\033[0m\n", tick() - at);
+            ticks = tick() - at;
         }
     }
 

@@ -1,5 +1,7 @@
 #include "time.h"
 
+tick_t ticks = 0;
+
 tick_t tick(void)
 {
     unsigned int lo, hi;

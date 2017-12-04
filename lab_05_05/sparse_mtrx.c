@@ -9,6 +9,8 @@
 #include "lib/errors.h"
 #include "lib/time.h"
 
+extern tick_t ticks;
+
 int smtrx_init(size_t m, size_t n, size_t elements, smtrx_pt *mtrx_pp)
 {
     assert(mtrx_pp != NULL);
@@ -99,7 +101,7 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
             }
         }
     }
-    printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", tick() - at);
+    ticks = tick() - at;
 
     for (int i = 0; i < b->n; i++)
         if (fabsf(res[i]) > 1e-7)
