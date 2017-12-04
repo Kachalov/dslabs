@@ -58,6 +58,7 @@ void smtrx_delete(smtrx_pt *mtrx_pp)
 int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
 {
     *c = NULL;
+    tick_t at;
 
     // Only vector
     if (a->m != 1)
@@ -69,6 +70,15 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     int i = 0;
     int j = 0;
 
+    if (a->len == 0 || b->len == 0)
+    {
+        at = tick();
+        smtrx_init(a->m, b->n, 0, c);
+        ticks = tick() - at;
+        return EOK;
+    }
+
+    at = tick();
     list1_t *la = list1_get(a->r, 0);
     list1_t *ra = la->next == NULL ? NULL : la->next;
     list1_t *lb = list1_get(b->r, a->j[la->data]);
@@ -78,7 +88,6 @@ int smtrx_mul(smtrx_pt a, smtrx_pt b, smtrx_pt *c)
     for (int j = 0; j < b->n; j++)
         res[j] = 0;
 
-    tick_t at = tick();
     {
         for (int ai = la->data; ai < ra->data; ai++)
         {

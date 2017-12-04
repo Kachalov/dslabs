@@ -11,22 +11,22 @@ extern tick_t ticks;
 
 void smtrx_print(smtrx_pt sc)
 {
-    printf("A: ");
+    printf("A:  ");
     for (int i = 0; i < sc->len; i++)
-        printf("%.3f ", sc->a[i]);
+        printf("%7.3f ", sc->a[i]);
     printf("\n");
 
-    printf("J: ");
+    printf("JA: ");
     for (int i = 0; i < sc->len; i++)
-        printf("%d ", sc->j[i]);
+        printf("%3d ", sc->j[i]);
     printf("\n");
 
-    printf("R: ");
+    printf("IA: ");
     for (list1_t *l = sc->r; l; l = l->next)
-        printf("%d ", l->data);
+        printf("%3d ", l->data);
     printf("\n");
 
-    printf("Sparse: %.3f%%\n", 100 * smtrx_sparse(sc));
+    printf("Sparse: %7.3f%%\n", 100 * smtrx_sparse(sc));
 }
 
 int mtrx_read(mtrxp_t *m_p)
@@ -37,7 +37,7 @@ int mtrx_read(mtrxp_t *m_p)
     float x;
     char c;
 
-    if (scanf("%d %d\n", &i, &j) !=2)
+    if ((c = scanf("%d %d\n", &i, &j)) != 2)
         return EFORMAT;
 
     if ((err = alloc_mtrx(i, j, m_p, NULL, NULL)) != EOK)
