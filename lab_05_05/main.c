@@ -23,6 +23,8 @@ void smtrx_print(smtrx_pt sc)
     for (list1_t *l = sc->r; l; l = l->next)
         printf("%d ", l->data);
     printf("\n");
+
+    printf("Sparse: %.1f%%\n", 100 * smtrx_sparse(sc));
 }
 
 int mtrx_read(mtrxp_t *m_p)
@@ -103,7 +105,7 @@ int main(int argc, char **argv)
 
                 smtrx_pt sa;
                 mtrx_smtrx(a, &sa);
-                
+
                 smtrx_pt sb;
                 mtrx_smtrx(b, &sb);
 

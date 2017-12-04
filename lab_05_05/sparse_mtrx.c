@@ -167,6 +167,11 @@ int smtrx_mtrx(smtrx_pt f, mtrxp_t *t_p)
     return EOK;
 }
 
+float smtrx_sparse(smtrx_pt m)
+{
+    return (float)m->els/m->m/m->n;
+}
+
 /**
  * @attention Use only for packing
  * @param m

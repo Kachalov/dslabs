@@ -28,3 +28,4 @@ mtrx_data_i_t apply_mtrx_smtrx(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, voi
 mtrx_data_i_t apply_mtrx_smtrx_count(mtrxp_t mtrx_p, mtrx_size_t i, mtrx_size_t j, void *arg);
 int mtrx_smtrx(mtrxp_t f, smtrx_pt *t_p);
 int smtrx_mtrx(smtrx_pt f, mtrxp_t *t_p);
+float smtrx_sparse(smtrx_pt m);
