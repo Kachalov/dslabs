@@ -50,6 +50,40 @@ void smtrx_print(smtrx_pt sc)
     printf("Sparse: %7.3f%%\n", 100 * smtrx_sparse(sc));
 }
 
+int smtrx_cmp(smtrx_pt a, smtrx_pt b)
+{
+    if (a->n != b->n ||
+        a->m != b->m ||
+        a->len != b->len)
+        return 1;
+
+    for (int i = 0; i < a->len; i++)
+    {
+        if (a->a[i] != a->a[i] ||
+            a->j[i] != a->j[i])
+            return 2;
+    }
+
+    list1_t *ar = a->r;
+    list1_t *br = b->r;
+    while (ar)
+    {
+        if (!br)
+            return 3;
+
+        if (ar->data != br->data)
+            return 4;
+
+        ar = ar->next;
+        br = br->next;
+    }
+
+    if (ar != br)
+        return 5;
+
+    return 0;
+}
+
 int mtrx_read(mtrxp_t *m_p)
 {
     int err = EOK;
@@ -157,6 +191,17 @@ int main(int argc, char **argv)
 
                 if (err == EOK)
                 {
+                    smtrx_pt scc;
+                    mtrx_smtrx(c, &scc);
+
+                    int eq = smtrx_cmp(sc, scc);
+                    if (eq == 0)
+                        printf("Result status: equal\n");
+                    else
+                        printf("Result status: not equal #%d!\n", eq);
+
+                    smtrx_delete(&scc);
+
                     printf("\nResult:\n");
                     smtrx_print(sc);
 
