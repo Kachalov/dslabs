@@ -23,7 +23,7 @@ void smtrx_print(smtrx_pt sc)
                 printf("<...> ");
         }
         else
-            printf("%7.3f ", sc->a[i]);
+            printf("%.3f ", sc->a[i]);
     }
     printf("\n");
 
@@ -36,14 +36,18 @@ void smtrx_print(smtrx_pt sc)
                 printf("<...> ");
         }
         else
-            printf("%3d ", sc->j[i]);
+            printf("%d ", sc->j[i]);
     }
     printf("\n");
 
     printf("IA: ");
-    for (list1_t *l = sc->r; l; l = l->next)
+    int i = 0;
+    for (list1_t *l = sc->r; l; l = l->next, i++)
     {
-        printf("%3d ", l->data);
+        if (i == MAX_SHOW)
+            printf("<...> ");
+        else if (i < MAX_SHOW)
+            printf("%d ", l->data);
     }
     printf("\n");
 
