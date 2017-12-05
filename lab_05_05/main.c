@@ -98,6 +98,7 @@ int main(int argc, char **argv)
 {
     int err = EOK;
 
+    tick_t at = 0;
     tick_t ticks_mtrx = 0;
     tick_t ticks_smtrx = 0;
 
@@ -113,8 +114,9 @@ int main(int argc, char **argv)
         err = mtrx_read(&b);
         if (err == EOK)
         {
+            at = tick();
             err = mul_mtrx(a, b, &c);
-            ticks_mtrx = ticks;
+            ticks_mtrx = tick() - at;
             if (err == EOK)
             {
                 printf("A mtrx:\n");
@@ -143,8 +145,9 @@ int main(int argc, char **argv)
                 mtrx_smtrx(b, &sb);
 
                 smtrx_pt sc;
+                tick_t at = tick();
                 err = smtrx_mul(sa, sb, &sc);
-                ticks_smtrx = ticks;
+                ticks_smtrx = tick() - at;
 
                 printf("A mtrx:\n");
                 smtrx_print(sa);
