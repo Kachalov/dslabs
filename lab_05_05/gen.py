@@ -9,7 +9,7 @@ def gen(fn, m, n, sparse):
     mtrx = [[0] * n for _ in range(m)]
     pos = [(mi, ni) for ni in range(n) for mi in range(m)]
 
-    while abs((1 - sparse) - els / (m * n)) > 1e-7:
+    while (1 - sparse) > els / (m * n):
         els += 1
         rndx = random.randint(0, len(pos) - 1)
         rpos = pos[rndx]
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     m, n = int(m), int(n)
     sparse = float(sparse) / 100
 
-    gen(fn, m, n, sparse)
+    print(gen(fn, m, n, sparse))

@@ -7,23 +7,44 @@
 #include "lib/time.h"
 #include "sparse_mtrx.h"
 
+#define MAX_ELS 10
+#define MAX_SHOW 4
+
 extern tick_t ticks;
 
 void smtrx_print(smtrx_pt sc)
 {
     printf("A:  ");
     for (int i = 0; i < sc->len; i++)
-        printf("%7.3f ", sc->a[i]);
+    {
+        if (i >= MAX_SHOW && sc->len - i > MAX_SHOW && sc->len > MAX_ELS)
+        {
+            if (i == MAX_SHOW)
+                printf("<...> ");
+        }
+        else
+            printf("%7.3f ", sc->a[i]);
+    }
     printf("\n");
 
     printf("JA: ");
     for (int i = 0; i < sc->len; i++)
-        printf("%3d ", sc->j[i]);
+    {
+        if (i >= MAX_SHOW && sc->len - i > MAX_SHOW && sc->len > MAX_ELS)
+        {
+            if (i == MAX_SHOW)
+                printf("<...> ");
+        }
+        else
+            printf("%3d ", sc->j[i]);
+    }
     printf("\n");
 
     printf("IA: ");
     for (list1_t *l = sc->r; l; l = l->next)
+    {
         printf("%3d ", l->data);
+    }
     printf("\n");
 
     printf("Sparse: %7.3f%%\n", 100 * smtrx_sparse(sc));
@@ -38,7 +59,9 @@ int mtrx_read(mtrxp_t *m_p)
     char c;
 
     if ((c = scanf("%d %d\n", &i, &j)) != 2)
+    {
         return EFORMAT;
+    }
 
     if ((err = alloc_mtrx(i, j, m_p, NULL, NULL)) != EOK)
         return err;
@@ -47,14 +70,18 @@ int mtrx_read(mtrxp_t *m_p)
     {
         ungetc(c, stdin);
         if (scanf("%d %d %f\n", &i, &j, &x) != 3)
+        {
             return EFORMAT;
+        }
 
         i--;
         j--;
 
         if (i < 0 || (*m_p)->m <= i ||
             j < 0 || (*m_p)->n <= j)
+        {
             return EFORMAT;
+        }
 
         (*m_p)->d[i][j] = x;
     }
@@ -129,14 +156,14 @@ int main(int argc, char **argv)
                 {
                     printf("\nResult:\n");
                     smtrx_print(sc);
+
+                    printf("\nTicks  MTRX: \033[1;31m%"PRIu64"\033[0m\n", ticks_mtrx);
+                    printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", ticks_smtrx);
                 }
 
                 smtrx_delete(&sa);
                 smtrx_delete(&sb);
                 smtrx_delete(&sc);
-
-                printf("\nTicks  MTRX: \033[1;31m%"PRIu64"\033[0m\n", ticks_mtrx);
-                printf("Ticks SMTRX: \033[1;32m%"PRIu64"\033[0m\n", ticks_smtrx);
             }
         }
     }
