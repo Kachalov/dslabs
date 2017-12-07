@@ -148,8 +148,9 @@ int mul_mtrx(mtrxp_t a, mtrxp_t b, mtrxp_t *c_p)
         {
             tick_t at = tick();
             for (int i = 0; i < a->m; i++)
-                for (int j = 0; j < b->n; j++)
-                    (*c_p)->d[i][j] = mul_i_mtrx(a, b, i, j);
+                for (int k = 0; k < a->n; k++)
+                    for (int j = 0; j < b->n; j++)
+                        (*c_p)->d[i][j] += a->d[i][k] * b->d[k][j];
             ticks = tick() - at;
         }
     }

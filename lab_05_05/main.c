@@ -183,7 +183,7 @@ int main(int argc, char **argv)
                 mtrx_smtrx(b, &sb);
 
                 smtrx_pt sc;
-                tick_t at = tick();
+                at = tick();
                 err = smtrx_mul(sa, sb, &sc);
                 ticks_smtrx = tick() - at;
 
