@@ -47,8 +47,7 @@ int main(int argc, char **argv)
     while (!feof(fp))
     {
         fscanf(fp, "%79s", buf);
-        if (strcmp(buf, ""))
-            if (buf[0] == argv[2][0])
+        if (strcmp(buf, "") && buf[0] != argv[2][0])
                 fprintf(fout, "%s\n", buf);
 
         buf[0] = '\0';
