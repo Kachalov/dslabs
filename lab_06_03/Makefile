@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -Wall -Werror -pedantic -std=gnu11
-OBJS := avl.o
+OBJS := avl.o lib/time.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage
