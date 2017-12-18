@@ -52,6 +52,8 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n");
         print_nodes_dot(p);
+        hc_print(hc);
+        fprintf(stderr, "Closed hash efficiency: %.2f\n", (float)hc->els / hc->cells);
     }
 
     at = tick();
@@ -78,19 +80,15 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n");
         print_nodes_dot(p);
+        hc_print(hc);
+        fprintf(stderr, "Closed hash efficiency: %.2f\n", (float)hc->els / hc->cells);
     }
-
-    hc_print(hc);
-    printf("efficiency: %.2f\n", (float)hc->els / hc->cells);
 
     at = tick();
     for_each(it, hc->data[hc_hash(hc, argv[2])])
         if (argv[2][0] == ((hce_pt)it->data)->k[0])
             hc_del(hc, ((hce_pt)it->data)->k);
     ticks_hc = tick() - at;
-
-    hc_print(hc);
-    printf("efficiency: %.2f\n", (float)hc->els / hc->cells);
 
     fprintf(stderr, "Ticks  hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
     fprintf(stderr, "Ticks  tree: \033[1;32m%"PRIu64"\033[0m\n", ticks_tree);

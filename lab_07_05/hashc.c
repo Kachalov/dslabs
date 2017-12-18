@@ -99,9 +99,9 @@ void hc_print(hc_pt h)
 {
     for (int i = 0; i < h->n; i++)
     {
-        printf("%d: ", i);
+        fprintf(stderr, "%d: ", i);
         for_each(it, h->data[i])
-            printf("%s:%s, ", ((hce_pt)it->data)->k, ((hce_pt)it->data)->v);
-        printf("\n");
+            fprintf(stderr, "%s:%s, ", ((hce_pt)it->data)->k, ((hce_pt)it->data)->v);
+        fprintf(stderr, "\n");
     }
 }
