@@ -179,25 +179,69 @@ node_t *remove_first_letter(node_t *p, char let)
     return p;
 }
 
-void print_nodes(node_t *p)
+void print_nodes_pre(node_t *p)
 {
     if (!p)
     {
-        printf("\033[7;41;31m \033[0m");
+        fprintf(stderr, "\033[7;41;31m \033[0m");
         return;
     }
 
     if (!p->l && !p->r)
     {
-        printf("%s", p->key);
+        fprintf(stderr, "%s", p->key);
         return;
     }
 
-    printf("(");
-    print_nodes(p->l);
-    printf(" %s ", p->key);
-    print_nodes(p->r);
-    printf(")");
+    fprintf(stderr, "(");
+    fprintf(stderr, "%s ", p->key);
+    print_nodes_pre(p->l);
+    fprintf(stderr, " ");
+    print_nodes_pre(p->r);
+    fprintf(stderr, ")");
+}
+
+void print_nodes_in(node_t *p)
+{
+    if (!p)
+    {
+        fprintf(stderr, "\033[7;41;31m \033[0m");
+        return;
+    }
+
+    if (!p->l && !p->r)
+    {
+        fprintf(stderr, "%s", p->key);
+        return;
+    }
+
+    fprintf(stderr, "(");
+    print_nodes_in(p->l);
+    fprintf(stderr, " %s ", p->key);
+    print_nodes_in(p->r);
+    fprintf(stderr, ")");
+}
+
+void print_nodes_post(node_t *p)
+{
+    if (!p)
+    {
+        fprintf(stderr, "\033[7;41;31m \033[0m");
+        return;
+    }
+
+    if (!p->l && !p->r)
+    {
+        fprintf(stderr, "%s", p->key);
+        return;
+    }
+
+    fprintf(stderr, "(");
+    print_nodes_post(p->l);
+    fprintf(stderr, " ");
+    print_nodes_post(p->r);
+    fprintf(stderr, " %s", p->key);
+    fprintf(stderr, ")");
 }
 
 void print_nodes_dot_rec(node_t *p)
@@ -230,5 +274,3 @@ void print_nodes_dot(node_t *p)
     print_nodes_dot_rec(p);
     printf("}\n");
 }
-
-

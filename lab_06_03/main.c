@@ -13,9 +13,9 @@ int main(int argc, char **argv)
     tick_t ticks_tree = 0;
     tick_t ticks_file = 0;
 
-    if (argc < 4)
+    if (argc < 5)
     {
-        fprintf(stderr, "Args: filename symbol -|+\n");
+        fprintf(stderr, "Args: filename symbol -|+ pre|in|post\n");
         return 1;
     }
 
@@ -35,7 +35,13 @@ int main(int argc, char **argv)
     }
 
     if (strcmp("-", argv[3]) == 0)
+    {
+        if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
+        else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
+        else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
+        fprintf(stderr, "\n");
         print_nodes_dot(p);
+    }
 
     at = tick();
     p = remove_first_letter(p, argv[2][0]);
@@ -55,9 +61,15 @@ int main(int argc, char **argv)
     ticks_file = tick() - at;
 
     if (strcmp("+", argv[3]) == 0)
+    {
+        if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
+        else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
+        else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
+        fprintf(stderr, "\n");
         print_nodes_dot(p);
+    }
 
-    fprintf(stderr, "\nTicks  tree: \033[1;31m%"PRIu64"\033[0m\n", ticks_tree);
+    fprintf(stderr, "Ticks  tree: \033[1;31m%"PRIu64"\033[0m\n", ticks_tree);
     fprintf(stderr, "Ticks file: \033[1;32m%"PRIu64"\033[0m\n", ticks_file);
 
     if (fp)
