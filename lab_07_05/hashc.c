@@ -40,10 +40,7 @@ hc_pt hc_init(int n)
 
 int hc_hash(hc_pt h, char *k)
 {
-    int hash = 0;
-
-    for (char *i = k; *i; i++)
-        hash = (hash + *i) % h->n;
+    int hash = k[0] % h->n;
 
     return hash;
 }
@@ -86,7 +83,7 @@ void hc_del(hc_pt h, char *k)
 
     for_each(it, h->data[hash])
     {
-        if (strcmp(it->data, k) == 0)
+        if (strcmp(((hce_pt)it->data)->k, k) == 0)
         {
             delete_node_before(&h->data[hash], prev);
             h->els--;
