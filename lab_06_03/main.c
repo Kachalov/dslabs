@@ -69,8 +69,8 @@ int main(int argc, char **argv)
         print_nodes_dot(p);
     }
 
-    fprintf(stderr, "Ticks  tree: \033[1;31m%"PRIu64"\033[0m\n", ticks_tree);
-    fprintf(stderr, "Ticks file: \033[1;32m%"PRIu64"\033[0m\n", ticks_file);
+    fprintf(stderr, "Ticks  tree: \033[1;32m%"PRIu64"\033[0m\n", ticks_tree);
+    fprintf(stderr, "Ticks file:  \033[1;31m%"PRIu64"\033[0m\n", ticks_file);
 
     if (fp)
         fclose(fp);
