@@ -14,9 +14,10 @@ int main(int argc, char **argv)
     char *cpy = NULL;
     char key[2] = "";
     tick_t at = 0;
+    tick_t ticks_ho = 0;
     tick_t ticks_hc = 0;
-    tick_t ticks_tree = 0;
-    tick_t ticks_file = 0;
+    tick_t ticks_avl = 0;
+    tick_t ticks_bst = 0;
 
     if (argc < 5)
     {
@@ -44,6 +45,7 @@ int main(int argc, char **argv)
         }
         buf[0] = '\0';
     }
+    fclose(fp);
 
     if (strcmp("-", argv[3]) == 0)
     {
@@ -58,20 +60,7 @@ int main(int argc, char **argv)
 
     at = tick();
     p = remove_first_letter(p, argv[2][0]);
-    ticks_tree = tick() - at;
-
-    FILE *fout = fopen("out.txt", "w");
-    fseek(fp, 0, SEEK_SET);
-    at = tick();
-    while (!feof(fp))
-    {
-        fscanf(fp, "%79s", buf);
-        if (strcmp(buf, "") && buf[0] != argv[2][0])
-                fprintf(fout, "%s\n", buf);
-
-        buf[0] = '\0';
-    }
-    ticks_file = tick() - at;
+    ticks_avl = tick() - at;
 
     if (strcmp("+", argv[3]) == 0)
     {
@@ -90,12 +79,10 @@ int main(int argc, char **argv)
             hc_del(hc, ((hce_pt)it->data)->k);
     ticks_hc = tick() - at;
 
-    fprintf(stderr, "Ticks  hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
-    fprintf(stderr, "Ticks  tree: \033[1;32m%"PRIu64"\033[0m\n", ticks_tree);
-    fprintf(stderr, "Ticks file:  \033[1;31m%"PRIu64"\033[0m\n", ticks_file);
-
-    if (fp)
-        fclose(fp);
+    fprintf(stderr, "Ticks open hash:  \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
+    fprintf(stderr, "Ticks close hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
+    fprintf(stderr, "Ticks AVL:        \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
+    fprintf(stderr, "Ticks BST:        \033[1;32m%"PRIu64"\033[0m\n", ticks_bst);
 
     return 0;
 }
