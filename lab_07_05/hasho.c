@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "hasho.h"
+#include "lib/debug.h"
 #include "lib/errors.h"
 
 hoe_pt hoe_init(char *k , char *v)
@@ -60,10 +61,11 @@ int ho_add(ho_pt h, char *k, char *v)
 
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
-           h->data[hash]->deleted != 0;
+           h->data[hash]->deleted == 0;
          hash = (hash + 1) % h->n);
 
     h->data[hash] = he;
+    DPRINT("HO ADD: hash(%s, %s) = %d", k, v, hash);
 
     return EOK;
 }
@@ -76,23 +78,32 @@ char *ho_get(ho_pt h, char *k)
            strcmp(h->data[hash]->k, k) != 0;
          hash = (hash + 1) % h->n);
 
-    return h->data[hash] ? h->data[hash]->v : NULL;
+    return h->data[hash] && !h->data[hash]->deleted ? h->data[hash]->v : NULL;
 }
 
 void ho_del(ho_pt h, char *k)
 {
     int hash = ho_hash(h, k);
-    char *v = ho_get(h, k);
 
-    if (v)
+    for (; h->data[hash] != NULL &&
+           strcmp(h->data[hash]->k, k) != 0;
+           hash = (hash + 1) % h->n);
+
+    if (h->data[hash] && !h->data[hash]->deleted)
     {
         h->els--;
         if (!h->data[hash])
             h->cells--;
+
+        h->data[hash]->deleted = 1;
     }
 }
 
 void ho_print(ho_pt h)
 {
-
+    for (int i = 0; i < h->n; i++)
+        if (h->data[i] && !h->data[i]->deleted)
+            fprintf(stderr, "%d: %s:%s\n", i, h->data[i]->k, h->data[i]->v);
+        else if (h->data[i])
+            fprintf(stderr, "%d:\n", i);
 }

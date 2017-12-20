@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "hashc.h"
+#include "hasho.h"
 #include "avl.h"
 #include "lib/time.h"
 
@@ -10,6 +11,7 @@ int main(int argc, char **argv)
 {
     node_t *p = NULL;
     hc_pt hc = hc_init(8);
+    ho_pt ho = ho_init(128);
     char buf[80];
     char *cpy = NULL;
     char key[2] = "";
@@ -42,6 +44,7 @@ int main(int argc, char **argv)
             strcpy(cpy, buf);
             strncpy(key, buf, 1);
             hc_add(hc, cpy, cpy);
+            ho_add(ho, cpy, cpy);
         }
         buf[0] = '\0';
     }
@@ -54,13 +57,28 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n");
         print_nodes_dot(p);
+        fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
-        fprintf(stderr, "Closed hash efficiency: %.2f\n", (float)hc->els / hc->cells);
+        fprintf(stderr, "\nOpened hash (efficiency: %.2f):\n", (float)ho->els / ho->cells);
+        ho_print(ho);
+        fprintf(stderr, "\n");
     }
 
     at = tick();
     p = remove_first_letter(p, argv[2][0]);
     ticks_avl = tick() - at;
+
+    at = tick();
+    for_each(it, hc->data[hc_hash(hc, argv[2])])
+        if (argv[2][0] == ((hce_pt)it->data)->k[0])
+            hc_del(hc, ((hce_pt)it->data)->k);
+    ticks_hc = tick() - at;
+
+    at = tick();
+    for (int i = 0; i < ho->n; i++)
+        if (ho->data[i] && argv[2][0] == ho->data[i]->k[0])
+            ho_del(ho, ho->data[i]->k);
+    ticks_ho = tick() - at;
 
     if (strcmp("+", argv[3]) == 0)
     {
@@ -69,15 +87,12 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n");
         print_nodes_dot(p);
+        fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
-        fprintf(stderr, "Closed hash efficiency: %.2f\n", (float)hc->els / hc->cells);
+        fprintf(stderr, "\nOpened hash (efficiency: %.2f):\n", (float)ho->els / ho->cells);
+        ho_print(ho);
+        fprintf(stderr, "\n");
     }
-
-    at = tick();
-    for_each(it, hc->data[hc_hash(hc, argv[2])])
-        if (argv[2][0] == ((hce_pt)it->data)->k[0])
-            hc_del(hc, ((hce_pt)it->data)->k);
-    ticks_hc = tick() - at;
 
     fprintf(stderr, "Ticks open hash:  \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
     fprintf(stderr, "Ticks close hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
