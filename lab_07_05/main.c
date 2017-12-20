@@ -5,11 +5,13 @@
 #include "hashc.h"
 #include "hasho.h"
 #include "avl.h"
+#include "bst.h"
 #include "lib/time.h"
 
 int main(int argc, char **argv)
 {
     node_t *p = NULL;
+    bst_pt bst = NULL;
     hc_pt hc = hc_init(8);
     ho_pt ho = ho_init(128);
     char buf[80];
@@ -40,6 +42,7 @@ int main(int argc, char **argv)
         if (strcmp(buf, ""))
         {
             p = insert(p, buf);
+            bst = bst_add(bst, buf, buf);
             cpy = malloc(strlen(buf) + 1);
             strcpy(cpy, buf);
             strncpy(key, buf, 1);
@@ -52,10 +55,14 @@ int main(int argc, char **argv)
 
     if (strcmp("-", argv[3]) == 0)
     {
+        fprintf(stderr, "AVL: ");
         if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
-        fprintf(stderr, "\n");
+        fprintf(stderr, "\n\n");
+        fprintf(stderr, "BST: ");
+        print_bst_in(bst);
+        fprintf(stderr, "\n\n");
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
@@ -67,6 +74,10 @@ int main(int argc, char **argv)
     at = tick();
     p = remove_first_letter(p, argv[2][0]);
     ticks_avl = tick() - at;
+
+    at = tick();
+    bst = bst_remove_first_letter(bst, argv[2][0]);
+    ticks_bst = tick() - at;
 
     at = tick();
     for_each(it, hc->data[hc_hash(hc, argv[2])])
@@ -82,10 +93,14 @@ int main(int argc, char **argv)
 
     if (strcmp("+", argv[3]) == 0)
     {
+        fprintf(stderr, "AVL: ");
         if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
-        fprintf(stderr, "\n");
+        fprintf(stderr, "\n\n");
+        fprintf(stderr, "BST: ");
+        print_bst_in(bst);
+        fprintf(stderr, "\n\n");
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
