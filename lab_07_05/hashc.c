@@ -39,14 +39,19 @@ hc_pt hc_init(int n)
     return h;
 }
 
-int hc_hash(hc_pt h, char *k)
+uint64_t hc_hash(hc_pt h, char *k)
 {
-    return hash_str(k) % h->n;
+    uint64_t pow = 1;
+    uint64_t hash = 0;
+    for (char *i = k; *k; k++, pow *= HASH_POW_BASE)
+        hash = (hash + *i * pow) % h->n;
+
+    return hash;
 }
 
 int hc_add(hc_pt h, char *k, char *v)
 {
-    int hash = hc_hash(h, k);
+    uint64_t hash = hc_hash(h, k);
 
     h->els++;
     if (!h->data[hash])
@@ -66,7 +71,7 @@ int hc_add(hc_pt h, char *k, char *v)
 
 char *hc_get(hc_pt h, char *k)
 {
-    int hash = hc_hash(h, k);
+    uint64_t hash = hc_hash(h, k);
 
     for_each(it, h->data[hash])
         if (strcmp(((hce_pt)it->data)->k, k) == 0)
@@ -77,7 +82,7 @@ char *hc_get(hc_pt h, char *k)
 
 void hc_del(hc_pt h, char *k)
 {
-    int hash = hc_hash(h, k);
+    uint64_t hash = hc_hash(h, k);
     list1_t *prev = NULL;
 
     for_each(it, h->data[hash])

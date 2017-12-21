@@ -32,7 +32,7 @@ uint64_t hash(uint64_t *h, int l, int r)
 
 uint64_t hash_str(char *h)
 {
-    static uint64_t hs[1000];
+    uint64_t hs[1000];
     int len = strlen(h);
 
     hs[0] = h[0];

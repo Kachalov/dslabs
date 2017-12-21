@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-#define HASH_POW_BASE 63;
+#define HASH_POW_BASE 63
+#define HASH_MAX_COLLISION 5
 
 extern uint64_t *hash_pow;
 

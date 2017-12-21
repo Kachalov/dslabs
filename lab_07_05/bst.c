@@ -109,6 +109,18 @@ bst_pt bst_remove_first_letter(bst_pt bst, char let)
     return bst;
 }
 
+void bst_find_first_letter(bst_pt bst, char let, list1_t **ret)
+{
+    if (!bst)
+        return;
+
+    bst_find_first_letter(bst->l, let, ret);
+    bst_find_first_letter(bst->r, let, ret);
+
+    if (*bst->k == let)
+        insert_data(ret, bst->k);
+}
+
 void print_bst_in(bst_pt bst)
 {
     if (!bst)

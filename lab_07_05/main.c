@@ -7,6 +7,7 @@
 #include "hasho.h"
 #include "avl.h"
 #include "bst.h"
+#include "lib/list.h"
 #include "lib/time.h"
 
 int main(int argc, char **argv)
@@ -15,6 +16,7 @@ int main(int argc, char **argv)
     bst_pt bst = NULL;
     hc_pt hc = hc_init(8);
     ho_pt ho = ho_init(128);
+    list1_t *l_res = NULL;
     char buf[80];
     char *cpy = NULL;
     char key[2] = "";
@@ -63,9 +65,9 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n\n");
-        fprintf(stderr, "BST: ");
+        /* fprintf(stderr, "BST: ");
         print_bst_in(bst);
-        fprintf(stderr, "\n\n");
+        fprintf(stderr, "\n\n"); */
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
@@ -74,29 +76,29 @@ int main(int argc, char **argv)
         fprintf(stderr, "\n");
     }
 
+    bst_find_first_letter(bst, argv[2][0], &l_res);
+    for_each(it, l_res)
+    {
+        strcpy(buf, (char *)it->data);
+
+        at = tick();
+        hc_del(hc, buf);
+        ticks_hc =+ tick() - at;
+
+        at = tick();
+        ho_del(ho, buf);
+        ticks_ho =+ tick() - at;
+
+        pop_front(&l_res);
+    }
+
     at = tick();
     p = remove_first_letter(p, argv[2][0]);
     ticks_avl = tick() - at;
 
-    at = tick();
+    /* at = tick();
     bst = bst_remove_first_letter(bst, argv[2][0]);
-    ticks_bst = tick() - at;
-
-    strncpy(key, argv[2], 1);
-    uint64_t hl = hash_str(key);
-    // TODO: refactoring
-    at = tick();
-    for_each(it, hc->data[hc_hash(hc, argv[2])])
-        if (argv[2][0] == ((hce_pt)it->data)->k[0])
-            hc_del(hc, ((hce_pt)it->data)->k);
-    ticks_hc = tick() - at;
-
-    // TODO: refactoring
-    at = tick();
-    for (int i = 0; i < ho->n; i++)
-        if (ho->data[i] && argv[2][0] == ho->data[i]->k[0])
-            ho_del(ho, ho->data[i]->k);
-    ticks_ho = tick() - at;
+    ticks_bst = tick() - at; */
 
     if (strcmp("+", argv[3]) == 0)
     {
@@ -105,9 +107,9 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n\n");
-        fprintf(stderr, "BST: ");
+        /* fprintf(stderr, "BST: ");
         print_bst_in(bst);
-        fprintf(stderr, "\n\n");
+        fprintf(stderr, "\n\n"); */
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);

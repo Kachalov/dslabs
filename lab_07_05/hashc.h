@@ -21,7 +21,7 @@ typedef hc_t *hc_pt;
 
 hce_pt hce_init(char *k , char *v);
 hc_pt hc_init(int n);
-int hc_hash(hc_pt h, char *k);
+uint64_t hc_hash(hc_pt h, char *k);
 int hc_add(hc_pt h, char *k, char *v);
 char *hc_get(hc_pt h, char *k);
 void hc_del(hc_pt h, char *k);
