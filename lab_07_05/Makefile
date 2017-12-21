@@ -1,9 +1,13 @@
 CC := gcc
-CFLAGS := -Wall -Werror -pedantic -std=gnu11
+CFLAGS := -Wall -pedantic -std=gnu11
 OBJS := lib/time.o lib/list.o avl.o bst.o hash.o hasho.o hashc.o
 
 ifeq ($(mode), debug)
 	CFLAGS += -g3 -O0 -DDEBUG -fprofile-arcs -ftest-coverage
+endif
+
+ifdef flags
+	CFLAGS += $(flags)
 endif
 
 ifeq ($(mode), release)

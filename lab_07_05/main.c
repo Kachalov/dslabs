@@ -65,9 +65,11 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n\n");
-        /* fprintf(stderr, "BST: ");
-        print_bst_in(bst);
-        fprintf(stderr, "\n\n"); */
+        #ifdef DELBST
+            fprintf(stderr, "BST: ");
+            print_bst_in(bst);
+            fprintf(stderr, "\n\n");
+        #endif
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
@@ -96,9 +98,11 @@ int main(int argc, char **argv)
     p = remove_first_letter(p, argv[2][0]);
     ticks_avl = tick() - at;
 
-    /* at = tick();
-    bst = bst_remove_first_letter(bst, argv[2][0]);
-    ticks_bst = tick() - at; */
+    #ifdef DELBST
+        at = tick();
+        bst = bst_remove_first_letter(bst, argv[2][0]);
+        ticks_bst = tick() - at;
+    #endif
 
     if (strcmp("+", argv[3]) == 0)
     {
@@ -107,9 +111,11 @@ int main(int argc, char **argv)
         else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
         else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
         fprintf(stderr, "\n\n");
-        /* fprintf(stderr, "BST: ");
-        print_bst_in(bst);
-        fprintf(stderr, "\n\n"); */
+        #ifdef DELBST
+            fprintf(stderr, "BST: ");
+            print_bst_in(bst);
+            fprintf(stderr, "\n\n");
+        #endif
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
         hc_print(hc);
@@ -118,6 +124,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "\n");
     }
 
+    fprintf(stderr, "Deleting:\n");
     fprintf(stderr, "Ticks open hash:  \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
     fprintf(stderr, "Ticks close hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
     fprintf(stderr, "Ticks AVL:        \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
