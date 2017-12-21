@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "hash.h"
 #include "hasho.h"
 #include "lib/debug.h"
 #include "lib/errors.h"
@@ -41,9 +42,7 @@ ho_pt ho_init(int n)
 
 int ho_hash(ho_pt h, char *k)
 {
-    int hash = k[0] % h->n;
-
-    return hash;
+    return hash_str(k) % h->n;
 }
 
 int ho_add(ho_pt h, char *k, char *v)

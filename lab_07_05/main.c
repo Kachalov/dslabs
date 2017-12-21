@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hash.h"
 #include "hashc.h"
 #include "hasho.h"
 #include "avl.h"
@@ -35,6 +36,8 @@ int main(int argc, char **argv)
         fprintf(stderr, "File could not be read\n");
         return 1;
     }
+
+    init_hash_pow(100);
 
     while (!feof(fp))
     {
@@ -79,12 +82,16 @@ int main(int argc, char **argv)
     bst = bst_remove_first_letter(bst, argv[2][0]);
     ticks_bst = tick() - at;
 
+    strncpy(key, argv[2], 1);
+    uint64_t hl = hash_str(key);
+    // TODO: refactoring
     at = tick();
     for_each(it, hc->data[hc_hash(hc, argv[2])])
         if (argv[2][0] == ((hce_pt)it->data)->k[0])
             hc_del(hc, ((hce_pt)it->data)->k);
     ticks_hc = tick() - at;
 
+    // TODO: refactoring
     at = tick();
     for (int i = 0; i < ho->n; i++)
         if (ho->data[i] && argv[2][0] == ho->data[i]->k[0])

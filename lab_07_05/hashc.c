@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "hash.h"
 #include "hashc.h"
 #include "lib/errors.h"
 #include "lib/list.h"
@@ -40,9 +41,7 @@ hc_pt hc_init(int n)
 
 int hc_hash(hc_pt h, char *k)
 {
-    int hash = k[0] % h->n;
-
-    return hash;
+    return hash_str(k) % h->n;
 }
 
 int hc_add(hc_pt h, char *k, char *v)
