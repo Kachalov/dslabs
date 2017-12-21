@@ -14,8 +14,8 @@ int main(int argc, char **argv)
 {
     node_t *p = NULL;
     bst_pt bst = NULL;
-    hc_pt hc = hc_init(8);
-    ho_pt ho = ho_init(128);
+    hc_pt hc = hc_init(131);
+    ho_pt ho = ho_init(131);
     list1_t *l_res = NULL;
     char buf[80];
     char *cpy = NULL;
@@ -71,9 +71,11 @@ int main(int argc, char **argv)
             fprintf(stderr, "\n\n");
         #endif
         print_nodes_dot(p);
-        fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
+        fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
+                (float)hc->els / hc->cells, hc->els, hc->cells);
         hc_print(hc);
-        fprintf(stderr, "\nOpened hash (efficiency: %.2f):\n", (float)ho->els / ho->cells);
+        fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
+                (float)ho->els / ho->cells, ho->els, ho->cells);
         ho_print(ho);
         fprintf(stderr, "\n");
     }
@@ -117,18 +119,20 @@ int main(int argc, char **argv)
             fprintf(stderr, "\n\n");
         #endif
         print_nodes_dot(p);
-        fprintf(stderr, "\nClosed hash (efficiency: %.2f):\n", (float)hc->els / hc->cells);
+        fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
+                (float)hc->els / hc->cells, hc->els, hc->cells);
         hc_print(hc);
-        fprintf(stderr, "\nOpened hash (efficiency: %.2f):\n", (float)ho->els / ho->cells);
+        fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
+                (float)ho->els / ho->cells, ho->els, ho->cells);
         ho_print(ho);
         fprintf(stderr, "\n");
     }
 
     fprintf(stderr, "Deleting:\n");
-    fprintf(stderr, "Ticks open hash:  \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
-    fprintf(stderr, "Ticks close hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
-    fprintf(stderr, "Ticks AVL:        \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
-    fprintf(stderr, "Ticks BST:        \033[1;32m%"PRIu64"\033[0m\n", ticks_bst);
+    fprintf(stderr, "Ticks opened hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
+    fprintf(stderr, "Ticks closed hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
+    fprintf(stderr, "Ticks AVL:         \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
+    fprintf(stderr, "Ticks BST:         \033[1;32m%"PRIu64"\033[0m\n", ticks_bst);
 
     return 0;
 }

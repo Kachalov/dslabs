@@ -53,13 +53,10 @@ uint64_t ho_hash(ho_pt h, char *k)
 int ho_add(ho_pt h, char *k, char *v)
 {
     uint64_t hash = ho_hash(h, k);
+    uint64_t hash_origin = hash;
 
     if (h->els + 1 > h->n)
         return EOOM;
-
-    h->els++;
-    if (!h->data[hash])
-        h->cells++;
 
     hoe_pt he = hoe_init(k, v);
 
@@ -67,6 +64,11 @@ int ho_add(ho_pt h, char *k, char *v)
            strcmp(h->data[hash]->k, k) != 0 &&
            h->data[hash]->deleted == 0;
          hash = (hash + 1) % h->n);
+
+    if (!h->data[hash])
+        h->els++;
+    if (hash == hash_origin)
+        h->cells++;
 
     h->data[hash] = he;
     DPRINT("HO ADD: hash(%s, %s) = %d", k, v, hash);
@@ -95,10 +97,6 @@ void ho_del(ho_pt h, char *k)
 
     if (h->data[hash] && !h->data[hash]->deleted)
     {
-        h->els--;
-        if (!h->data[hash])
-            h->cells--;
-
         h->data[hash]->deleted = 1;
     }
 }
