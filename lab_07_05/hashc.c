@@ -43,6 +43,7 @@ uint64_t hc_hash(hc_pt h, char *k)
 {
     uint64_t pow = 1;
     uint64_t hash = 0;
+
     for (char *i = k; *k; k++, pow *= HASH_POW_BASE)
         hash = (hash + *i * pow) % h->n;
 
@@ -111,4 +112,26 @@ void hc_print(hc_pt h)
             fprintf(stderr, "%s:%s, ", ((hce_pt)it->data)->k, ((hce_pt)it->data)->v);
         fprintf(stderr, "\n");
     }
+}
+
+void hc_restruct(hc_pt *h)
+{
+    int ns = primary(2 * (*h)->n + 1);
+    hc_pt nh = hc_init(ns);
+
+    for (int i = 0; i < (*h)->n; i++)
+    {
+        if (!(*h)->data[i])
+            continue;
+
+        for_each(it, (*h)->data[i])
+            hc_add(nh, ((hce_pt) it->data)->k, ((hce_pt) it->data)->v);
+    }
+
+    *h = nh;
+}
+
+float hc_efficiency(hc_pt h)
+{
+    return (float)h->els / h->cells;
 }

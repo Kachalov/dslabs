@@ -2,6 +2,8 @@
 
 #include "lib/list.h"
 
+#define HASHC_MAX 2.0
+
 typedef struct
 {
     char *k;
@@ -26,3 +28,5 @@ int hc_add(hc_pt h, char *k, char *v);
 char *hc_get(hc_pt h, char *k);
 void hc_del(hc_pt h, char *k);
 void hc_print(hc_pt h);
+void hc_restruct(hc_pt *h);
+float hc_efficiency(hc_pt h);

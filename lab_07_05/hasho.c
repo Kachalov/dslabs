@@ -44,6 +44,7 @@ uint64_t ho_hash(ho_pt h, char *k)
 {
     uint64_t pow = 1;
     uint64_t hash = 0;
+
     for (char *i = k; *k; k++, pow *= HASH_POW_BASE)
         hash = (hash + *i * pow) % h->n;
 
@@ -71,7 +72,7 @@ int ho_add(ho_pt h, char *k, char *v)
         h->cells++;
 
     h->data[hash] = he;
-    DPRINT("HO ADD: hash(%s, %s) = %d", k, v, hash);
+    DPRINT("HO ADD: hash(%s, %s) = %lu", k, v, hash);
 
     return EOK;
 }
@@ -79,10 +80,15 @@ int ho_add(ho_pt h, char *k, char *v)
 char *ho_get(ho_pt h, char *k)
 {
     uint64_t hash = ho_hash(h, k);
+    int i = 0;
 
     for (; h->data[hash] != NULL &&
-           strcmp(h->data[hash]->k, k) != 0;
+           strcmp(h->data[hash]->k, k) != 0 &&
+           i < h->n;
          hash = (hash + 1) % h->n);
+
+    if (i == h->n)
+        return NULL;
 
     return h->data[hash] && !h->data[hash]->deleted ? h->data[hash]->v : NULL;
 }
@@ -90,10 +96,15 @@ char *ho_get(ho_pt h, char *k)
 void ho_del(ho_pt h, char *k)
 {
     uint64_t hash = ho_hash(h, k);
+    int i = 0;
 
     for (; h->data[hash] != NULL &&
-           strcmp(h->data[hash]->k, k) != 0;
-           hash = (hash + 1) % h->n);
+           strcmp(h->data[hash]->k, k) != 0 &&
+           i < h->n;
+         hash = (hash + 1) % h->n, i++);
+
+    if (i == h->n)
+        return;
 
     if (h->data[hash] && !h->data[hash]->deleted)
     {
@@ -108,4 +119,21 @@ void ho_print(ho_pt h)
             fprintf(stderr, "%d: %s:%s\n", i, h->data[i]->k, h->data[i]->v);
         else if (h->data[i])
             fprintf(stderr, "%d: \033[7;31;31m DEL \033[0m\n", i);
+}
+
+void ho_restruct(ho_pt *h)
+{
+    int ns = primary(2 * (*h)->n + 1);
+    ho_pt nh = ho_init(ns);
+
+    for (int i = 0; i < (*h)->n; i++)
+        if ((*h)->data[i] && !(*h)->data[i]->deleted)
+            ho_add(nh, (*h)->data[i]->k, (*h)->data[i]->v);
+
+    *h = nh;
+}
+
+float ho_efficiency(ho_pt h)
+{
+    return (float)h->els / h->cells;
 }

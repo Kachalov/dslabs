@@ -14,8 +14,8 @@ int main(int argc, char **argv)
 {
     node_t *p = NULL;
     bst_pt bst = NULL;
-    hc_pt hc = hc_init(131);
-    ho_pt ho = ho_init(131);
+    hc_pt hc = hc_init(5);
+    ho_pt ho = ho_init(5);
     list1_t *l_res = NULL;
     char buf[80];
     char *cpy = NULL;
@@ -51,8 +51,14 @@ int main(int argc, char **argv)
             cpy = malloc(strlen(buf) + 1);
             strcpy(cpy, buf);
             strncpy(key, buf, 1);
+
             hc_add(hc, cpy, cpy);
+            if (hc_efficiency(hc) > HASHC_MAX)
+                hc_restruct(&hc);
+
             ho_add(ho, cpy, cpy);
+            if (ho_efficiency(ho) > HASHO_MAX)
+                ho_restruct(&ho);
         }
         buf[0] = '\0';
     }
@@ -120,10 +126,10 @@ int main(int argc, char **argv)
         #endif
         print_nodes_dot(p);
         fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
-                (float)hc->els / hc->cells, hc->els, hc->cells);
+                hc_efficiency(hc), hc->els, hc->cells);
         hc_print(hc);
         fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
-                (float)ho->els / ho->cells, ho->els, ho->cells);
+                ho_efficiency(ho), ho->els, ho->cells);
         ho_print(ho);
         fprintf(stderr, "\n");
     }

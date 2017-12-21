@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "hash.h"
+#include "lib/debug.h"
 
 uint64_t *hash_pow = NULL;
 int hash_pow_len = 0;
@@ -40,4 +41,27 @@ uint64_t hash_str(char *h)
         hs[i] = hs[i - 1] + hash_pow[i] * h[i];
 
     return hash(hs, 0, len);
+}
+
+int primary(int num)
+{
+    DPRINT("old primary(%d)", num);
+    int pr = 0;
+
+    if (num % 2 == 0)
+        num--;
+
+    do
+    {
+        pr = 1;
+        num += 2;
+        for (int i = 3; i < num - 1; i += 2)
+            if (num % i == 0)
+                pr = 0;
+    }
+    while (!pr);
+
+    DPRINT("new primary(%d)", num);
+
+    return num;
 }
