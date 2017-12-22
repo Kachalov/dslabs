@@ -99,8 +99,10 @@ char *bst_get(bst_pt bst, char *k)
         bst_cmps++;
         if(strcmp(k, bst->k) < 0)
             ret = bst_get(bst->l, k);
-        else
+        else if(strcmp(k, bst->k) > 0)
             ret = bst_get(bst->r, k);
+        else
+            return bst->k;
     }
 
     return ret;

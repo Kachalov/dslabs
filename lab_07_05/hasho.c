@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "hash.h"
@@ -78,7 +79,7 @@ int ho_add(ho_pt h, char *k, char *v)
         h->cells++;
 
     h->data[hash] = he;
-    DPRINT("HO ADD: hash(%s, %s) = %lu", k, v, hash);
+    DPRINT("HO ADD: hash(%s, %s) = %" PRIu64, k, v, hash);
 
     return EOK;
 }

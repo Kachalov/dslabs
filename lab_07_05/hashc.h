@@ -2,7 +2,7 @@
 
 #include "lib/list.h"
 
-#define HASHC_MAX 2.0
+#define HASHC_MAX 4.0
 
 extern int hc_cmps;
 

@@ -9,6 +9,7 @@
 #include "bst.h"
 #include "lib/list.h"
 #include "lib/time.h"
+#include "lib/debug.h"
 
 int main(int argc, char **argv)
 {
@@ -58,12 +59,20 @@ int main(int argc, char **argv)
             strncpy(key, buf, 1);
 
             hc_add(hc, cpy, cpy);
-            if (hc_efficiency(hc) > HASHC_MAX)
+            if ((float)hc->cells / hc->n > 0.5)
+            {
+                DPRINT("Closed hash (efficiency: %.2f %d/%d)",
+                        hc_efficiency(hc), hc->els, hc->cells);
                 hc_restruct(&hc);
+            }
 
             ho_add(ho, cpy, cpy);
-            if (ho_efficiency(ho) > HASHO_MAX)
+            if ((float)ho->els / ho->n > 0.3)
+            {
+                DPRINT("Opened hash (efficiency: %.2f %d/%d)",
+                        ho_efficiency(ho), ho->els, ho->cells);
                 ho_restruct(&ho);
+            }
         }
         buf[0] = '\0';
     }
@@ -127,25 +136,25 @@ int main(int argc, char **argv)
                 at = tick();
                 hc_del(hc, buf);
                 ticks_hc = tick() - at;
-                cmp_hc = hc_cmps - cmp_hc;
+                cmp_hc = hc_cmps - ac;
 
                 ac = ho_cmps;
                 at = tick();
                 ho_del(ho, buf);
                 ticks_ho = tick() - at;
-                cmp_ho = ho_cmps - cmp_ho;
+                cmp_ho = ho_cmps - ac;
 
                 ac = bst_cmps;
                 at = tick();
                 bst = bst_del(bst, buf);
                 ticks_bst = tick() - at;
-                cmp_bst = bst_cmps - cmp_bst;
+                cmp_bst = bst_cmps - ac;
 
                 ac = avl_cmps;
                 at = tick();
                 p = remove_key(p, buf);
                 ticks_avl = tick() - at;
-                cmp_avl = avl_cmps - cmp_avl;
+                cmp_avl = avl_cmps - ac;
                 break;
 
             case 3:
@@ -154,27 +163,27 @@ int main(int argc, char **argv)
 
                 ac = hc_cmps;
                 at = tick();
-                hc_get(hc, buf);
+                printf("HC: %s\n", hc_get(hc, buf));
                 ticks_hc = tick() - at;
-                cmp_hc = hc_cmps - cmp_hc;
+                cmp_hc = hc_cmps - ac;
 
                 ac = ho_cmps;
                 at = tick();
-                ho_get(ho, buf);
+                printf("HO: %s\n", ho_get(ho, buf));
                 ticks_ho = tick() - at;
-                cmp_ho = ho_cmps - cmp_ho;
+                cmp_ho = ho_cmps - ac;
 
                 ac = bst_cmps;
                 at = tick();
-                bst_get(bst, buf);
+                printf("BST: %s\n", bst_get(bst, buf));
                 ticks_bst = tick() - at;
-                cmp_bst = bst_cmps - cmp_bst;
+                cmp_bst = bst_cmps - ac;
 
                 ac = avl_cmps;
                 at = tick();
-                find_key(p, buf);
+                printf("AVL: %s\n", find_key(p, buf));
                 ticks_avl = tick() - at;
-                cmp_avl = avl_cmps - cmp_avl;
+                cmp_avl = avl_cmps - ac;
                 break;
 
             case 4:
