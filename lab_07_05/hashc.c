@@ -7,6 +7,8 @@
 #include "lib/errors.h"
 #include "lib/list.h"
 
+int hc_cmps = 0;
+
 hce_pt hce_init(char *k , char *v)
 {
     hce_pt he = malloc(sizeof(hce_t) + strlen(k) + strlen(v) + 2);
@@ -61,11 +63,14 @@ int hc_add(hc_pt h, char *k, char *v)
     hce_pt he = hce_init(k, v);
 
     for_each(it, h->data[hash])
+    {
+        hc_cmps++;
         if (strcmp(((hce_pt)it->data)->k, k) == 0)
         {
             it->data = he;
             return EOK;
         }
+    }
 
     return insert_data(&h->data[hash], he);
 }
@@ -75,8 +80,11 @@ char *hc_get(hc_pt h, char *k)
     uint64_t hash = hc_hash(h, k);
 
     for_each(it, h->data[hash])
+    {
+        hc_cmps++;
         if (strcmp(((hce_pt)it->data)->k, k) == 0)
             return ((hce_pt)it->data)->v;
+    }
 
     return NULL;
 }
@@ -88,6 +96,7 @@ void hc_del(hc_pt h, char *k)
 
     for_each(it, h->data[hash])
     {
+        hc_cmps++;
         if (strcmp(((hce_pt)it->data)->k, k) == 0)
         {
             delete_node_before(&h->data[hash], prev);

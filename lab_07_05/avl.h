@@ -1,5 +1,7 @@
 #include <inttypes.h>
 
+extern int avl_cmps;
+
 typedef struct _node_t
 {
     char *key;
@@ -17,6 +19,7 @@ node_t *rotate_left(node_t *q);
 node_t *balance(node_t *p);
 node_t *insert(node_t *p, char *k);
 node_t *find_min(node_t *p);
+char *find_key(node_t *p, char *k);
 node_t *remove_min(node_t *p);
 node_t *remove_key(node_t *p, char *k);
 node_t *remove_first_letter(node_t *p, char let);

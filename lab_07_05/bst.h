@@ -2,6 +2,8 @@
 
 #include "lib/list.h"
 
+extern int bst_cmps;
+
 typedef struct _bst_t
 {
     char *k;
@@ -19,4 +21,3 @@ char *bst_get(bst_pt bst, char *k);
 bst_pt bst_remove_first_letter(bst_pt bst, char let);
 void bst_find_first_letter(bst_pt bst, char let, list1_t **ret);
 void print_bst_in(bst_pt bst);
-

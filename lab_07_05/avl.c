@@ -5,6 +5,8 @@
 
 #include "avl.h"
 
+int avl_cmps = 0;
+
 node_t *node_init(char *k)
 {
     node_t *p = malloc(sizeof(node_t) + strlen(k) + 1);
@@ -25,6 +27,7 @@ int node_key_cmp(char *pk, char *qk)
     assert(pk);
     assert(qk);
 
+    avl_cmps++;
     return -strcmp(pk, qk);
 }
 
@@ -123,6 +126,19 @@ node_t *find_min(node_t *p)
     assert(p);
 
     return p->l ? find_min(p->l) : p;
+}
+
+char *find_key(node_t *p, char *k)
+{
+    if (!p)
+        return NULL;
+
+    if(node_key_cmp(k, p->key) < 0)
+        return find_key(p->l, k);
+    else if(node_key_cmp(k, p->key) > 0)
+        return find_key(p->r, k);
+    else
+        return p->key;
 }
 
 node_t *remove_min(node_t *p)

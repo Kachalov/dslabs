@@ -7,6 +7,8 @@
 #include "lib/debug.h"
 #include "lib/errors.h"
 
+int ho_cmps = 0;
+
 hoe_pt hoe_init(char *k , char *v)
 {
     hoe_pt he = malloc(sizeof(hoe_t) + strlen(k) + strlen(v) + 2);
@@ -55,6 +57,7 @@ int ho_add(ho_pt h, char *k, char *v)
 {
     uint64_t hash = ho_hash(h, k);
     uint64_t hash_origin = hash;
+    int i = 0;
 
     if (h->els + 1 > h->n)
         return EOOM;
@@ -63,9 +66,12 @@ int ho_add(ho_pt h, char *k, char *v)
 
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
-           h->data[hash]->deleted == 0;
-         hash = (hash + 1) % h->n);
+           h->data[hash]->deleted == 0 &&
+           i < h->n;
+         hash = (hash + 1) % h->n, i++, ho_cmps++);
 
+    if (i == h->n)
+        return EOOM;
     if (!h->data[hash])
         h->els++;
     if (hash == hash_origin)
@@ -85,7 +91,7 @@ char *ho_get(ho_pt h, char *k)
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
            i < h->n;
-         hash = (hash + 1) % h->n);
+         hash = (hash + 1) % h->n, i++, ho_cmps++);
 
     if (i == h->n)
         return NULL;
@@ -101,7 +107,7 @@ void ho_del(ho_pt h, char *k)
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
            i < h->n;
-         hash = (hash + 1) % h->n, i++);
+         hash = (hash + 1) % h->n, i++, ho_cmps++);
 
     if (i == h->n)
         return;

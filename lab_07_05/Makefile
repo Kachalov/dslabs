@@ -21,6 +21,10 @@ endif
 main.run: $(OBJS) main.o
 	$(CC) $(CFLAGS) $^ -o $@
 
+perf.run: $(OBJS) perf.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+
 %.o: %.c *.h
 	$(CC) $(CFLAGS) -c $< -o $@
 

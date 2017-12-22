@@ -4,6 +4,8 @@
 
 #define HASHC_MAX 2.0
 
+extern int hc_cmps;
+
 typedef struct
 {
     char *k;

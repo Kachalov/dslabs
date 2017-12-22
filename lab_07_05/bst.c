@@ -4,6 +4,8 @@
 
 #include "bst.h"
 
+int bst_cmps = 0;
+
 bst_pt bst_init(char *k, char *v)
 {
     bst_pt p = malloc(sizeof(bst_t) + strlen(k) + strlen(v) + 2);
@@ -24,10 +26,14 @@ bst_pt bst_add(bst_pt bst, char *k, char *v)
 {
     if(!bst)
         bst = bst_init(k, v);
-    else if(strcmp(k, bst->k) < 0)
-        bst->l = bst_add(bst->l, k, v);
     else
-        bst->r = bst_add(bst->r, k, v);
+    {
+        bst_cmps++;
+        if(strcmp(k, bst->k) < 0)
+            bst->l = bst_add(bst->l, k, v);
+        else
+            bst->r = bst_add(bst->r, k, v);
+    }
 
     return bst;
 }
@@ -39,6 +45,7 @@ bst_pt bst_del(bst_pt bst, char *k)
     if(!bst)
         return bst;
 
+    bst_cmps++;
     if(strcmp(k, bst->k) < 0)
         bst->l = bst_del(bst->l, k);
     else if (strcmp(k, bst->k) > 0)
@@ -87,10 +94,14 @@ char *bst_get(bst_pt bst, char *k)
 
     if(!bst)
         ret = NULL;
-    else if(strcmp(k, bst->k) < 0)
-        ret = bst_get(bst->l, k);
     else
-        ret = bst_get(bst->r, k);
+    {
+        bst_cmps++;
+        if(strcmp(k, bst->k) < 0)
+            ret = bst_get(bst->l, k);
+        else
+            ret = bst_get(bst->r, k);
+    }
 
     return ret;
 }
@@ -103,6 +114,7 @@ bst_pt bst_remove_first_letter(bst_pt bst, char let)
     bst->l = bst_remove_first_letter(bst->l, let);
     bst->r = bst_remove_first_letter(bst->r, let);
 
+    bst_cmps++;
     if (*bst->k == let)
         bst = bst_del(bst, bst->k);
 
@@ -117,6 +129,7 @@ void bst_find_first_letter(bst_pt bst, char let, list1_t **ret)
     bst_find_first_letter(bst->l, let, ret);
     bst_find_first_letter(bst->r, let, ret);
 
+    bst_cmps++;
     if (*bst->k == let)
         insert_data(ret, bst->k);
 }

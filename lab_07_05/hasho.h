@@ -2,6 +2,8 @@
 
 #define HASHO_MAX 2.0
 
+extern int ho_cmps;
+
 typedef struct
 {
     int deleted;
