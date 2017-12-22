@@ -53,11 +53,11 @@ int main(int argc, char **argv)
             strncpy(key, buf, 1);
 
             hc_add(hc, cpy, cpy);
-            if (hc_efficiency(hc) > HASHC_MAX)
+            if ((float)hc->cells / hc->n > 0.5)
                 hc_restruct(&hc);
 
             ho_add(ho, cpy, cpy);
-            if (ho_efficiency(ho) > HASHO_MAX)
+            if ((float)ho->els / ho->n > 0.3)
                 ho_restruct(&ho);
         }
         buf[0] = '\0';
