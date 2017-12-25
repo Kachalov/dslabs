@@ -68,7 +68,7 @@ void sprint_mtrx(mtrxp_t mtrx_p, char *str)
     {
         for (int j = 0; j < mtrx_p->n; j++)
         {
-            sprintf(str + strlen(str), "%d", mtrx_p->d[i][j]);
+            sprintf(str + strlen(str), "%"PRIu32, mtrx_p->d[i][j]);
             if (j != mtrx_p->n - 1)
                 sprintf(str + strlen(str), " ");
         }

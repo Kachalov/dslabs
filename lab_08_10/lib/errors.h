@@ -10,5 +10,4 @@
 #define ENOFILE 7
 #define ENOPATH 8
 
-
 #define error(err, err_no, label) do {err = err_no; goto label;} while (0)

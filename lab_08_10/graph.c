@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "lib/errors.h"
 #include "graph.h"
@@ -37,7 +38,7 @@ void dijkstra(mtrxp_t mtrx, int node, int *d)
     for (int i = 0; i < mtrx->n; i++)
         for (int j = 0; j < mtrx->n; j++)
             if (mtrx->d[i][j] == 0)
-                mtrx->d[i][j] = 30;
+                mtrx->d[i][j] = (uint32_t) -2;
 
     for (int i = 0; i < mtrx->n; i++)
     {
@@ -65,7 +66,7 @@ void dijkstra(mtrxp_t mtrx, int node, int *d)
     }
 }
 
-int build_way(int T, mtrxp_t mtrx)
+int build_way(int t, mtrxp_t mtrx)
 {
     int arcs = 0;
     // TODO: malloc instead of VLA
@@ -127,7 +128,7 @@ int build_way(int T, mtrxp_t mtrx)
                     if (len[y] < mn)
                         mn = len[y];
 
-                if ((m <= T) && (mn > 0))
+                if ((m <= t) && (mn > 0))
                 {
                     mtrx->d[arr[i][0]][arr[i][1]] = 1;
                     mtrx->d[arr[j][0]][arr[j][1]] = 1;

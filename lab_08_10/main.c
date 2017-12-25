@@ -19,16 +19,16 @@ int main(int argc, char **argv)
     if ((err = read_mtrx(argv[1], &graph)) != EOK)
         error(err, err, exit);
 
-    fprint_graph_dot(stdout, graph);
-    print_mtrx(graph);
-
     printf("Max path len: ");
     scanf("%d", &t);
 
     if (build_way(t, graph) == EOK)
     {
         printf("Path has been found\n");
-        fprint_graph_dot(stderr, graph);
+        FILE *fout = fopen("graph.dot", "w");
+        fprint_graph_dot(fout, graph);
+        fclose(fout);
+        system("dot -Tpng -o graph.png graph.dot");
     }
     else
     {
