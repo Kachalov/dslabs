@@ -26,20 +26,23 @@ int main(int argc, char **argv)
     tick_t ticks_avl = 0;
     tick_t ticks_bst = 0;
 
-    if (argc < 5)
+    FILE *favlb = fopen("./out/avlb.dot", "w");
+    FILE *favle = fopen("./out/avle.dot", "w");
+    FILE *fbstb = fopen("./out/bstb.dot", "w");
+    FILE *fbste = fopen("./out/bste.dot", "w");
+
+    if (argc < 4)
     {
-        fprintf(stderr, "Args: filename symbol -|+ pre|in|post\n");
+        printf("Args: filename symbol pre|in|post\n");
         return 1;
     }
 
     FILE *fp = fopen(argv[1], "r");
     if (!fp)
     {
-        fprintf(stderr, "File could not be read\n");
+        printf("File could not be read\n");
         return 1;
     }
-
-    init_hash_pow(100);
 
     while (!feof(fp))
     {
@@ -64,27 +67,30 @@ int main(int argc, char **argv)
     }
     fclose(fp);
 
-    if (strcmp("-", argv[3]) == 0)
-    {
-        fprintf(stderr, "AVL: ");
-        if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
-        else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
-        else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
-        fprintf(stderr, "\n\n");
-        #ifdef DELBST
-            fprintf(stderr, "BST: ");
-            print_bst_in(bst);
-            fprintf(stderr, "\n\n");
-        #endif
-        print_nodes_dot(p);
-        fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
-                (float)hc->els / hc->cells, hc->els, hc->cells);
-        hc_print(hc);
-        fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
-                (float)ho->els / ho->cells, ho->els, ho->cells);
-        ho_print(ho);
-        fprintf(stderr, "\n");
-    }
+    printf("Before: \n");
+    printf("AVL: ");
+    if (strcmp(argv[3], "pre") == 0) print_nodes_pre(stdout, p);
+    else if (strcmp(argv[3], "in") == 0) print_nodes_in(stdout, p);
+    else if (strcmp(argv[3], "post") == 0) print_nodes_post(stdout, p);
+    printf("\n\n");
+    #ifdef DELBST
+        printf("BST: ");
+        print_bst_in(stdout, bst);
+        printf("\n\n");
+    #endif
+    print_nodes_dot(favlb, p);
+    fclose(favlb);
+    system("dot -Tpng -o out/avlb.png out/avlb.dot");
+    print_bst_dot(fbstb, bst);
+    fclose(fbstb);
+    system("dot -Tpng -o out/bstb.png out/bstb.dot");
+    printf("\nClosed hash (efficiency: %.2f %d/%d):\n",
+            (float)hc->els / hc->cells, hc->els, hc->cells);
+    hc_print(hc);
+    printf("\nOpened hash (efficiency: %.2f %d/%d):\n",
+            (float)ho->els / ho->cells, ho->els, ho->cells);
+    ho_print(ho);
+    printf("\n");
 
     bst_find_first_letter(bst, argv[2][0], &l_res);
     for_each(it, l_res)
@@ -112,33 +118,36 @@ int main(int argc, char **argv)
         ticks_bst = tick() - at;
     #endif
 
-    if (strcmp("+", argv[3]) == 0)
-    {
-        fprintf(stderr, "AVL: ");
-        if (strcmp(argv[4], "pre") == 0) print_nodes_pre(p);
-        else if (strcmp(argv[4], "in") == 0) print_nodes_in(p);
-        else if (strcmp(argv[4], "post") == 0) print_nodes_post(p);
-        fprintf(stderr, "\n\n");
-        #ifdef DELBST
-            fprintf(stderr, "BST: ");
-            print_bst_in(bst);
-            fprintf(stderr, "\n\n");
-        #endif
-        print_nodes_dot(p);
-        fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
-                hc_efficiency(hc), hc->els, hc->cells);
-        hc_print(hc);
-        fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
-                ho_efficiency(ho), ho->els, ho->cells);
-        ho_print(ho);
-        fprintf(stderr, "\n");
-    }
+    printf("After: \n");
+    printf("AVL: ");
+    if (strcmp(argv[3], "pre") == 0) print_nodes_pre(stdout, p);
+    else if (strcmp(argv[3], "in") == 0) print_nodes_in(stdout, p);
+    else if (strcmp(argv[3], "post") == 0) print_nodes_post(stdout, p);
+    printf("\n\n");
+    #ifdef DELBST
+        printf("BST: ");
+        print_bst_in(stdout, bst);
+        printf("\n\n");
+    #endif
+    print_nodes_dot(favle, p);
+    fclose(favle);
+    system("dot -Tpng -o out/avle.png out/avle.dot");
+    print_bst_dot(fbste, bst);
+    fclose(fbste);
+    system("dot -Tpng -o out/bste.png out/bste.dot");
+    printf("\nClosed hash (efficiency: %.2f %d/%d):\n",
+            hc_efficiency(hc), hc->els, hc->cells);
+    hc_print(hc);
+    printf("\nOpened hash (efficiency: %.2f %d/%d):\n",
+            ho_efficiency(ho), ho->els, ho->cells);
+    ho_print(ho);
+    printf("\n");
 
-    fprintf(stderr, "Deleting:\n");
-    fprintf(stderr, "Ticks opened hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
-    fprintf(stderr, "Ticks closed hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
-    fprintf(stderr, "Ticks AVL:         \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
-    fprintf(stderr, "Ticks BST:         \033[1;32m%"PRIu64"\033[0m\n", ticks_bst);
+    printf("Deleting:\n");
+    printf("Ticks opened hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_ho);
+    printf("Ticks closed hash: \033[1;32m%"PRIu64"\033[0m\n", ticks_hc);
+    printf("Ticks AVL:         \033[1;32m%"PRIu64"\033[0m\n", ticks_avl);
+    printf("Ticks BST:         \033[1;32m%"PRIu64"\033[0m\n", ticks_bst);
 
     return 0;
 }

@@ -34,16 +34,19 @@ int main(int argc, char **argv)
 
     int code = 0;
 
+    FILE *fbst = fopen("./out/bst.dot", "w");
+    FILE *favl = fopen("./out/avl.dot", "w");
+
     if (argc < 2)
     {
-        fprintf(stderr, "Args: filename\n");
+        printf("Args: filename\n");
         return 1;
     }
 
     FILE *fp = fopen(argv[1], "r");
     if (!fp)
     {
-        fprintf(stderr, "File could not be read\n");
+        printf("File could not be read\n");
         return 1;
     }
 
@@ -77,6 +80,15 @@ int main(int argc, char **argv)
         buf[0] = '\0';
     }
     fclose(fp);
+
+    print_nodes_dot(favl, p);
+    fclose(favl);
+    system("dot -Tpng -o out/avl.png out/avl.dot");
+    favl = fopen("./out/avl.dot", "w");
+    print_bst_dot(fbst, bst);
+    fclose(fbst);
+    system("dot -Tpng -o out/bst.png out/bst.dot");
+    fbst = fopen("./out/bst.dot", "w");
 
     do
     {
@@ -113,7 +125,7 @@ int main(int argc, char **argv)
                     ticks_hc = tick() - at;
                     cmp_hc = hc_cmps - ac;
 
-                    if (hc_efficiency(hc) > HASHC_MAX)
+                    if ((float)hc->cells / hc->n > 0.5)
                         hc_restruct(&hc);
 
                     ac = ho_cmps;
@@ -122,10 +134,19 @@ int main(int argc, char **argv)
                     ticks_ho = tick() - at;
                     cmp_ho = ho_cmps - ac;
 
-                    if (ho_efficiency(ho) > HASHO_MAX)
+                    if ((float)ho->els / ho->n > 0.3)
                         ho_restruct(&ho);
                 }
                 buf[0] = '\0';
+
+                print_nodes_dot(favl, p);
+                fclose(favl);
+                system("dot -Tpng -o out/avl.png out/avl.dot");
+                favl = fopen("./out/avl.dot", "w");
+                print_bst_dot(fbst, bst);
+                fclose(fbst);
+                system("dot -Tpng -o out/bst.png out/bst.dot");
+                fbst = fopen("./out/bst.dot", "w");
                 break;
 
             case 2:
@@ -155,6 +176,15 @@ int main(int argc, char **argv)
                 p = remove_key(p, buf);
                 ticks_avl = tick() - at;
                 cmp_avl = avl_cmps - ac;
+
+                print_nodes_dot(favl, p);
+                fclose(favl);
+                system("dot -Tpng -o out/avl.png out/avl.dot");
+                favl = fopen("./out/avl.dot", "w");
+                print_bst_dot(fbst, bst);
+                fclose(fbst);
+                system("dot -Tpng -o out/bst.png out/bst.dot");
+                fbst = fopen("./out/bst.dot", "w");
                 break;
 
             case 3:
@@ -187,21 +217,21 @@ int main(int argc, char **argv)
                 break;
 
             case 4:
-                fprintf(stderr, "AVL: ");
-                print_nodes_in(p);
-                fprintf(stderr, "\n\n");
+                printf("AVL: ");
+                print_nodes_in(stdout, p);
+                printf("\n\n");
 
-                fprintf(stderr, "BST: ");
-                print_bst_in(bst);
-                fprintf(stderr, "\n");
+                printf("BST: ");
+                print_bst_in(stdout, bst);
+                printf("\n");
 
-                fprintf(stderr, "\nClosed hash (efficiency: %.2f %d/%d):\n",
+                printf("\nClosed hash (efficiency: %.2f %d/%d):\n",
                         hc_efficiency(hc), hc->els, hc->cells);
                 hc_print(hc);
-                fprintf(stderr, "\nOpened hash (efficiency: %.2f %d/%d):\n",
+                printf("\nOpened hash (efficiency: %.2f %d/%d):\n",
                         ho_efficiency(ho), ho->els, ho->cells);
                 ho_print(ho);
-                fprintf(stderr, "\n");
+                printf("\n");
                 break;
 
             default:
@@ -222,6 +252,9 @@ int main(int argc, char **argv)
         }
     }
     while (code);
+
+    fclose(favl);
+    fclose(fbst);
 
     return 0;
 }

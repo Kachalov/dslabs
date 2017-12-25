@@ -136,23 +136,54 @@ void bst_find_first_letter(bst_pt bst, char let, list1_t **ret)
         insert_data(ret, bst->k);
 }
 
-void print_bst_in(bst_pt bst)
+void print_bst_in(FILE *f, bst_pt bst)
 {
     if (!bst)
     {
-        fprintf(stderr, "\033[7;41;31m \033[0m");
+        fprintf(f, "\033[7;41;31m \033[0m");
         return;
     }
 
     if (!bst->l && !bst->r)
     {
-        fprintf(stderr, "%s", bst->k);
+        fprintf(f, "%s", bst->k);
         return;
     }
 
-    fprintf(stderr, "(");
-    print_bst_in(bst->l);
-    fprintf(stderr, " %s ", bst->k);
-    print_bst_in(bst->r);
-    fprintf(stderr, ")");
+    fprintf(f, "(");
+    print_bst_in(f, bst->l);
+    fprintf(f, " %s ", bst->k);
+    print_bst_in(f, bst->r);
+    fprintf(f, ")");
+}
+
+void print_bst_dot_rec(FILE *f, bst_pt bst)
+{
+    if (!bst)
+        return;
+
+    if (!bst->l && !bst->r)
+    {
+        fprintf(f, "    \"%s\";\n", bst->k);
+        return;
+    }
+
+    if (bst->r)
+    {
+        fprintf(f, "    \"%s\" -> \"%s\" [color=blue];\n", bst->k, bst->r->k);
+        print_bst_dot_rec(f, bst->r);
+    }
+
+    if (bst->l)
+    {
+        fprintf(f, "    \"%s\" -> \"%s\" [color=red];\n", bst->k, bst->l->k);
+        print_bst_dot_rec(f, bst->l);
+    }
+}
+
+void print_bst_dot(FILE *f, bst_pt bst)
+{
+    fprintf(f, "digraph graphname {\n");
+    print_bst_dot_rec(f, bst);
+    fprintf(f, "}\n");
 }

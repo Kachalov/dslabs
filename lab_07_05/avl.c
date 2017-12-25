@@ -133,9 +133,10 @@ char *find_key(node_t *p, char *k)
     if (!p)
         return NULL;
 
-    if(node_key_cmp(k, p->key) < 0)
+    int c = node_key_cmp(k, p->key);
+    if(c < 0)
         return find_key(p->l, k);
-    else if(node_key_cmp(k, p->key) > 0)
+    else if (c > 0)
         return find_key(p->r, k);
     else
         return p->key;
@@ -158,9 +159,10 @@ node_t *remove_key(node_t *p, char *k)
     if(!p)
         return 0;
 
-    if(node_key_cmp(k, p->key) < 0)
+    int c = node_key_cmp(k, p->key);
+    if(c < 0)
         p->l = remove_key(p->l, k);
-    else if(node_key_cmp(k, p->key) > 0)
+    else if (c > 0)
         p->r = remove_key(p->r, k);
     else
     {
@@ -195,98 +197,98 @@ node_t *remove_first_letter(node_t *p, char let)
     return p;
 }
 
-void print_nodes_pre(node_t *p)
+void print_nodes_pre(FILE *f, node_t *p)
 {
     if (!p)
     {
-        fprintf(stderr, "\033[7;41;31m \033[0m");
+        fprintf(f, "\033[7;41;31m \033[0m");
         return;
     }
 
     if (!p->l && !p->r)
     {
-        fprintf(stderr, "%s", p->key);
+        fprintf(f, "%s", p->key);
         return;
     }
 
-    fprintf(stderr, "(");
-    fprintf(stderr, "%s ", p->key);
-    print_nodes_pre(p->l);
-    fprintf(stderr, " ");
-    print_nodes_pre(p->r);
-    fprintf(stderr, ")");
+    fprintf(f, "(");
+    fprintf(f, "%s ", p->key);
+    print_nodes_pre(f, p->l);
+    fprintf(f, " ");
+    print_nodes_pre(f, p->r);
+    fprintf(f, ")");
 }
 
-void print_nodes_in(node_t *p)
+void print_nodes_in(FILE *f, node_t *p)
 {
     if (!p)
     {
-        fprintf(stderr, "\033[7;41;31m \033[0m");
+        fprintf(f, "\033[7;41;31m \033[0m");
         return;
     }
 
     if (!p->l && !p->r)
     {
-        fprintf(stderr, "%s", p->key);
+        fprintf(f, "%s", p->key);
         return;
     }
 
-    fprintf(stderr, "(");
-    print_nodes_in(p->l);
-    fprintf(stderr, " %s ", p->key);
-    print_nodes_in(p->r);
-    fprintf(stderr, ")");
+    fprintf(f, "(");
+    print_nodes_in(f, p->l);
+    fprintf(f, " %s ", p->key);
+    print_nodes_in(f, p->r);
+    fprintf(f, ")");
 }
 
-void print_nodes_post(node_t *p)
+void print_nodes_post(FILE *f, node_t *p)
 {
     if (!p)
     {
-        fprintf(stderr, "\033[7;41;31m \033[0m");
+        fprintf(f, "\033[7;41;31m \033[0m");
         return;
     }
 
     if (!p->l && !p->r)
     {
-        fprintf(stderr, "%s", p->key);
+        fprintf(f, "%s", p->key);
         return;
     }
 
-    fprintf(stderr, "(");
-    print_nodes_post(p->l);
-    fprintf(stderr, " ");
-    print_nodes_post(p->r);
-    fprintf(stderr, " %s", p->key);
-    fprintf(stderr, ")");
+    fprintf(f, "(");
+    print_nodes_post(f, p->l);
+    fprintf(f, " ");
+    print_nodes_post(f, p->r);
+    fprintf(f, " %s", p->key);
+    fprintf(f, ")");
 }
 
-void print_nodes_dot_rec(node_t *p)
+void print_nodes_dot_rec(FILE *f, node_t *p)
 {
     if (!p)
         return;
 
     if (!p->l && !p->r)
     {
-        printf("    \"%s\";\n", p->key);
+        fprintf(f, "    \"%s\";\n", p->key);
         return;
     }
 
     if (p->r)
     {
-        printf("    \"%s\" -> \"%s\" [color=blue];\n", p->key, p->r->key);
-        print_nodes_dot_rec(p->r);
+        fprintf(f, "    \"%s\" -> \"%s\" [color=blue];\n", p->key, p->r->key);
+        print_nodes_dot_rec(f, p->r);
     }
 
     if (p->l)
     {
-        printf("    \"%s\" -> \"%s\" [color=red];\n", p->key, p->l->key);
-        print_nodes_dot_rec(p->l);
+        fprintf(f, "    \"%s\" -> \"%s\" [color=red];\n", p->key, p->l->key);
+        print_nodes_dot_rec(f, p->l);
     }
 }
 
-void print_nodes_dot(node_t *p)
+void print_nodes_dot(FILE *f, node_t *p)
 {
-    printf("digraph graphname {\n");
-    print_nodes_dot_rec(p);
-    printf("}\n");
+    fprintf(f, "digraph graphname {\n");
+    print_nodes_dot_rec(f, p);
+    fprintf(f, "}\n");
 }
