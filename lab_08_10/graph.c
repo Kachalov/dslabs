@@ -17,9 +17,9 @@ void fprint_graph_dot(FILE *f, mtrxp_t mtrx)
             if (mtrx->d[i][j] != 0)
             {
                 if (mtrx->d[j][i] == 0)
-                    fprintf(f, "q%d -> q%d [dir=none, color=green];\n", i, j);
+                    fprintf(f, "q%d -> q%d [dir=none, color=green, label=%d];\n", i, j, mtrx->d[i][j]);
                 else
-                    fprintf(f, "q%d -> q%d [dir=none];\n", i, j);
+                    fprintf(f, "q%d -> q%d [dir=none, label=%d];\n", i, j, mtrx->d[j][i]);
             }
 
     fprintf(f, "}\n");

@@ -19,6 +19,8 @@ int main(int argc, char **argv)
     if ((err = read_mtrx(argv[1], &graph)) != EOK)
         error(err, err, exit);
 
+    print_mtrx(graph);
+
     printf("Max path len: ");
     scanf("%d", &t);
 
