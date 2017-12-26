@@ -101,7 +101,7 @@ int build_way(int t, mtrxp_t mtrx)
             for (int z = j + 1; z < arcs; z++)
             {
                 for (int y = 1; y < mtrx->n; y++)
-                    len[y] = 30;
+                    len[y] = (uint32_t) -2;
                 len[0] = 0;
 
                 for (int ik = 0; ik < mtrx->n; ik++)
@@ -118,7 +118,7 @@ int build_way(int t, mtrxp_t mtrx)
                 dijkstra(graph, 0, len);
 
                 int m = 0;
-                int mn = 30;
+                int mn = (uint32_t) -2;
 
                 for (int y = 1; y < mtrx->n; y++)
                     if (len[y] > m)
