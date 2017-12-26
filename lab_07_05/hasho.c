@@ -89,6 +89,8 @@ char *ho_get(ho_pt h, char *k)
     uint64_t hash = ho_hash(h, k);
     int i = 0;
 
+    ho_cmps++;
+
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
            i < h->n;
@@ -104,6 +106,8 @@ void ho_del(ho_pt h, char *k)
 {
     uint64_t hash = ho_hash(h, k);
     int i = 0;
+
+    ho_cmps++;
 
     for (; h->data[hash] != NULL &&
            strcmp(h->data[hash]->k, k) != 0 &&
@@ -126,6 +130,8 @@ void ho_print(ho_pt h)
             fprintf(stderr, "%d: %s:%s\n", i, h->data[i]->k, h->data[i]->v);
         else if (h->data[i])
             fprintf(stderr, "%d: \033[7;31;31m DEL \033[0m\n", i);
+        else
+            fprintf(stderr, "%d:\n", i);
 }
 
 void ho_restruct(ho_pt *h)

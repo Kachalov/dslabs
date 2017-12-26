@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -Wall -pedantic -std=gnu11
+CFLAGS := -Wall -pedantic -std=gnu11 -O3
 OBJS := lib/time.o lib/list.o avl.o bst.o hash.o hasho.o hashc.o
 
 ifeq ($(mode), debug)
@@ -11,7 +11,7 @@ ifdef flags
 endif
 
 ifeq ($(mode), release)
-	CFLAGS += -g0 -O3 -DNDEBUG
+	CFLAGS += -g0 -DNDEBUG
 endif
 
 ifeq ($(MAKECMDGOALS), main.so)

@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
         at = tick();
         hc_del(hc, buf);
-        ticks_hc =+ tick() - at;
+        ticks_hc =+ tick() - at - ticks;
 
         at = tick();
         ho_del(ho, buf);

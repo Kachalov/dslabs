@@ -156,7 +156,7 @@ int main(int argc, char **argv)
                 ac = hc_cmps;
                 at = tick();
                 hc_del(hc, buf);
-                ticks_hc = tick() - at;
+                ticks_hc = tick() - at - ticks;
                 cmp_hc = hc_cmps - ac;
 
                 ac = ho_cmps;

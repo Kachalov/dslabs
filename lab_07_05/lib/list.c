@@ -4,6 +4,7 @@
 #include "list.h"
 #include "debug.h"
 #include "errors.h"
+#include "time.h"
 
 int list_init(list1_t **head)
 {
@@ -49,7 +50,9 @@ void *pop_front(list1_t **head)
     {
         ret = (*head)->data;
         tmp = (*head)->next;
+        tick_t at = tick();
         free(*head);
+        ticks = tick() - at;
         *head = tmp;
     }
 
