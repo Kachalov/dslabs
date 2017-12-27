@@ -38,7 +38,7 @@ void dijkstra(mtrxp_t mtrx, int node, int *d)
     for (int i = 0; i < mtrx->n; i++)
         for (int j = 0; j < mtrx->n; j++)
             if (mtrx->d[i][j] == 0)
-                mtrx->d[i][j] = (uint32_t) -2;
+                mtrx->d[i][j] = 1000;
 
     for (int i = 0; i < mtrx->n; i++)
     {
@@ -101,7 +101,7 @@ int build_way(int t, mtrxp_t mtrx)
             for (int z = j + 1; z < arcs; z++)
             {
                 for (int y = 1; y < mtrx->n; y++)
-                    len[y] = (uint32_t) -2;
+                    len[y] = 1000;
                 len[0] = 0;
 
                 for (int ik = 0; ik < mtrx->n; ik++)
@@ -118,7 +118,7 @@ int build_way(int t, mtrxp_t mtrx)
                 dijkstra(graph, 0, len);
 
                 int m = 0;
-                int mn = (uint32_t) -2;
+                int mn = 1000;
 
                 for (int y = 1; y < mtrx->n; y++)
                     if (len[y] > m)
